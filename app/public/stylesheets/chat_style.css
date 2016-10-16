@@ -1,0 +1,220 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font: 13px Helvetica, Arial;
+    color: #757575;
+}
+
+.divider {
+    padding: 20px;
+    background: rgba(117, 117, 117, 0.65);
+    color: #fff;
+    font-size: medium;
+}
+
+#chat_input {
+    background: #fff;
+    padding: 3px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+#chat_input input {
+    border: 0;
+    padding: 10px;
+    width: 90%;
+    color: #757575;
+    border: 3px solid #FF5727;
+    border-radius: 5px;
+    background-color: #fff;
+    margin-right: 0.5%;
+}
+
+section h1 {
+    text-align: center;
+}
+
+#chat_input button {
+    width: 8%;
+    background-color: #FF5722;
+    color: #fff border: none;
+    padding: 10px;
+}
+
+.messages {
+    list-style-type: none;
+    padding: 0;
+}
+
+#messages_container {
+    padding: 0;
+    margin-bottom: 80px;
+    min-height: 1000px;
+    border: 3px solid #FF5727;
+    border-radius: 5px;
+}
+
+.messages li {
+    padding: 5px 10px;
+}
+
+
+/*#messages li:nth-child(odd) {
+    background: #eee;
+}*/
+
+.btn-primary, .btn-def, .panel-primary>.panel-heading {
+    background-image: linear-gradient(to bottom, #FF5727 0%, #FF5722 100%);
+    border-color: #FF5727;
+    color: #fff
+}
+
+.btn-primary:hover, .btn-def:hover, .btn-primary:focus, .btn-def:focus, .btn-primary:active, .btn-def:active {
+    background-image: linear-gradient(to bottom, #E64A19 0%, #E64A19 100%);
+    border-color: #E64A19;
+    background-position: 0;
+    color: #fff
+}
+
+.panel-primary {
+    border-color: #FF5727;
+}
+
+.panel-dark {
+    border-color: #757575;
+}
+
+.panel-dark>.panel-heading {
+    text-align: right;
+    background-image: linear-gradient(to bottom, #BDBDBD 0%, #BDBDBD 100%);
+}
+
+.panel-dark .panel-body {
+    text-align: right;
+}
+
+.Absolute-Center {
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.Absolute-Center.is-Responsive {
+    /*width: 50%;*/
+    height: 50%;
+    min-width: 200px;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.chat_heading, strong {
+    color: #E64A19;
+    font-weight: 700;
+}
+
+.chat_heading .chat_hour {
+    font-weight: 200;
+}
+
+.direct-chat-text::after, .direct-chat-text::before {
+    border-color: transparent #FFCCBC transparent transparent;
+}
+
+.direct-chat-text::after, .direct-chat-text::before {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: transparent #FFCCBC transparent transparent;
+    border-image: none;
+    border-style: solid;
+    border-width: medium;
+    content: " ";
+    height: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 100%;
+    top: 15px;
+    width: 0;
+}
+
+.direct-chat-text::after {
+    border-width: 5px;
+    margin-top: -5px;
+}
+
+li {
+    text-align: left;
+}
+
+.direct-chat-text {
+    display: inline-block;
+    background: none repeat scroll 0 0;
+    border: 1px solid #FFCCBC;
+    border-radius: 5px;
+    color: #444;
+    margin: 5px 0 0 0px;
+    padding: 5px 10px;
+    position: relative;
+}
+
+.direct-chat-text_dark {
+    display: inline-block;
+    background: #d2d6de none repeat scroll 0 0;
+    border: 1px solid #d2d6de;
+    border-radius: 5px;
+    color: #444;
+    margin: 5px 0 0 0px;
+    padding: 5px 10px;
+    position: relative;
+}
+
+._dark {
+    text-align: right;
+}
+
+.direct-chat-text_dark::after, .direct-chat-text_dark::before {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: transparent transparent transparent #d2d6de;
+    border-image: none;
+    border-style: solid;
+    border-width: medium;
+    content: " ";
+    height: 0;
+    pointer-events: none;
+    position: absolute;
+    left: 100%;
+    top: 15px;
+    width: 0;
+}
+
+.panel-body {
+    display: inline-block;
+}
+
+.panel .pannel-body-left {
+    text-align: left;
+}
+
+.panel-default {
+    width: 100%;
+}
+
+@media (max-width: 650px) {
+    #chat_input button, #chat_input input {
+        width: 100%;
+    }
+    .panel .panel-body {
+        text-align: center;
+    }
+}

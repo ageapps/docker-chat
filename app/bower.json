@@ -1,0 +1,22 @@
+{
+  "name": "docker-chat",
+  "description": "dockerized chat",
+  "main": "app.js",
+  "authors": [
+    "ageapps <age.apps.android@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/ageapps/SocketIOChatDemo",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.1.1"
+  }
+}

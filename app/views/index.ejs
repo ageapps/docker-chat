@@ -1,0 +1,194 @@
+<!-- WHOLE APP FRAME -->
+<!DOCTYPE html>
+<html>
+<head>
+    <% include ../views/templates/head %>
+    <style media="screen">
+      .chat_container,#old_messages_container{
+        display: none;
+      }
+    </style>
+</head>
+
+<body>
+    <section class="container">
+
+      <h1>Welcome to <%= title %> <a href="https://github.com/ageapps/SocketIOChatDemo" target="_blank"><img src="/images/github.png" alt="GitHub account"  width="35px"/></a></h1>
+
+
+
+      <div class="chat_container">
+        <div class="panel panel-default panel-dark container">
+          <div class="panel-body pannel-body-left col-sm-6 col-xs-12 ">
+            <strong id="user_name"></strong>
+          </div>
+          <div class="panel-body pannel-body-right col-sm-6 col-xs-12 ">
+            <small id="user_typing"></small>
+            People connected
+            <span class="badge"id="users_connected"><%= number_connected %></span>
+          </div>
+        </div>
+        <div id="messages_container">
+          <div id="old_messages_container">
+            <ul class="messages" id="old-messages"></ul>
+            <div class="divider text-center">
+              Old messages
+            </div>
+          </div>
+          <ul class="messages" id="new-messages"></ul>
+        </div>
+      </div>
+
+
+
+
+
+    <div class="container" id="login_container">
+      <div class="row">
+        <div class="Absolute-Center is-Responsive">
+          <div class="col-sm-12 col-md-10 col-md-offset-1 text-center">
+            <h3>Enter your Name</h3>
+            <form action="" id="login_form">
+              <div class="form-group input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                <input class="form-control" type="text" id="user" placeholder="..."/>
+              </div>
+              <div class="form-group">
+                <button type="submit button" class="btn btn-def btn-block">Login</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    </section>
+
+    <form class="chat_container form-inline" id="chat_input" action="">
+        <input id="m" autocomplete="off" placeholder="Write your mensaje..."/>
+        <button type="submit button" class="btn btn-primary btn-md">Send</button>
+    </form>
+
+
+    <% include ../views/templates/scripts %>
+
+    <script src="/socket/socket.io.js"></script>
+    <script type="text/javascript">
+
+</script>
+
+  <script type="text/javascript">
+    var myName = "";
+    var socket = io();
+    $('#login_form').submit(function() {
+      if ($('#user').val() && ($('#user').val() != "")) {
+        socket.emit('new user', $('#user').val());
+        myName = $('#user').val();
+        $('#user_name').text(myName);
+        $('#user').val('');
+        showLogin(false);
+        }
+      return false;
+    });
+
+    $('#chat_input').submit(function() {
+      if (!myName) {
+        showLogin(true);
+        return;
+      }
+      if ($('#m').val() && $('#m').val() != "") {
+        var message = {
+          text: $('#m').val(),
+          createdAt: new Date()
+        };
+        socket.emit('chat message', message);
+        appendMessage(true, message);
+        $('#m').val('');
+      }
+      return false;
+    });
+    socket.on('old message', function(msg, name) {
+        $("#old_messages_container").css("display", "block");
+        appendOldMessage(msg);
+    });
+    socket.on('connection on off', function(number) {
+      $('#users_connected').text(number);
+    });
+
+    socket.on('chat message', function(msg, name) {
+        appendMessage(false,msg,name);
+    });
+
+    socket.on('typing', function(isTyping, name) {
+      var text = ""
+      if (isTyping) {
+        text = name + " is typing..."
+      }
+      $('#user_typing').text(text);
+    });
+    socket.on('not connected', function() {
+      showLogin(true);
+    });
+
+    function appendMessage(mine , msg, name) {
+      var panelType = "";
+      var person = "me";
+      var time = "";
+      if (!mine) {
+        panelType = "_dark";
+        person = name;
+        var day = new Date(msg.createdAt);
+        time = day.getHours() + ":" + day.getMinutes();
+      } else{
+        time = msg.createdAt.getHours() + ":" + msg.createdAt.getMinutes();
+      }
+      $('#new-messages').append('<li class=\"'+ panelType+'\"> <div class=\"direct-chat-text' + panelType +'\"><h5 class=\"chat_heading\">'+ person +' <span class=\"chat_hour\"> '+ time +'</span></h5>'+
+      '<p>' + msg.text + '</p></div></li>')
+    }
+
+    function appendOldMessage(msg) {
+      var day = new Date(msg.createdAt);
+      var time = day.getHours() + ":" + day.getMinutes();
+      $('#old-messages').append('<li> <div class=\"direct-chat-text\"><h5 class=\"chat_heading\">me <span class=\"chat_hour\"> '+ time +'</span></h5>'+
+      '<p>' + msg.text + '</p></div></li>')
+    }
+
+
+    function showLogin(show){
+      if (show) {
+        $(".chat_container").css("display", "none");
+        $("#login_container").css("display", "block");
+      } else {
+        $(".chat_container").css("display", "block");
+        $("#login_container").css("display", "none");
+      }
+
+    }
+
+    //setup before functions
+var typingTimer;                //timer identifier
+var doneTypingInterval = 3000;  //time in ms, 5 second for example
+var $input = $('#m');
+
+//on keyup, start the countdown
+$input.on('keyup', function () {
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(doneTyping, doneTypingInterval);
+});
+
+//on keydown, clear the countdown
+$input.on('keydown', function () {
+  socket.emit("typing", true, myName);
+  clearTimeout(typingTimer);
+});
+
+//user is "finished typing," do something
+function doneTyping () {
+  socket.emit("typing", false, myName);
+}
+
+    </script>
+
+</body>
+</html>
