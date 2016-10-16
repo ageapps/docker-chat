@@ -36,9 +36,9 @@ $ docker-compose up
 [SocketIOChatDemo]: https://github.com/ageapps/SocketIOChatDemo.git
 [node image]: https://hub.docker.com/_/node/
 [mongo image]: https://hub.docker.com/_/mongo/
-[MongoDB]:MongoDB Official Site - mongodb.com‎
-[mongoose]:http://mongoosejs.com/index.html
-[node.js]:http://nodejs.org
+[MongoDB]: https://www.mongodb.com
+[mongoose]: http://mongoosejs.com/index.html
+[node.js]: http://nodejs.org
 [Docker]: https://docs.docker.com/
 [docker-compose]:https://docs.docker.com/compose/compose-file/
 [docker-build]:https://docs.docker.com/engine/reference/builder/
