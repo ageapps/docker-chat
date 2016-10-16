@@ -15,12 +15,21 @@ Yo can find a demo, working [here]
 
 ![demo](./chat_demo.gif)
 
-## Usage
+## Usage with git
 
 ```groovy
 $ git clone https://github.com/ageapps/docker-chat
 $ cd docker-chat
 $ docker-compose up
+// connect in your browser to <host IP>:8080
+```
+## Usage with Docker Hub
+
+```groovy
+// run mongo service
+$ docker run -v "$(pwd)":/data --name mongo -d mongo mongod --smallfiles
+// run docker-chat image
+$ docker run -d --name node_server -v "$(pwd)":/data --link mongo:mongo -p 8080:4000 ageapps/docker-chat
 // connect in your browser to <host IP>:8080
 ```
 
