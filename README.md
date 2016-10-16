@@ -6,7 +6,7 @@ Dockerized chat, based on my previous project [SocketIOChatDemo], which is an ex
 Following the [Microservices architecture], the system consists on two services that run in separate containers:
 
 + Web service: [node.js] server. Using the official [node image].
-+ Database service: [MongoDB] database. Using he official [mongo image].
++ Database service: [MongoDB] database. Using the official [mongo image].
 
 
 ## Demo
