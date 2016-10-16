@@ -11,6 +11,8 @@ Following the [Microservices architecture], the system consists on two services 
 
 ## Demo
 
+Yo can find a demo, working [here]
+
 ![demo](./chat_demo.gif)
 
 ## Usage
@@ -32,6 +34,7 @@ $ docker-compose up
 + [docker-compose]: Automated configuration and run of multi-container *Docker* applications.
 
 
+[here]: http://swarm1397.cloudhero.io:8080/
 [Microservices architecture]: http://microservices.io/patterns/microservices.html
 [SocketIOChatDemo]: https://github.com/ageapps/SocketIOChatDemo.git
 [node image]: https://hub.docker.com/_/node/
