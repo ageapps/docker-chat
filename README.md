@@ -1,6 +1,6 @@
 # docker-chat
 
-Dockerized chat, based on my previous project [SocketIOChatDemo], which is an example of a web application using *[socket.io]* library.
+Dockerized chat, based on my previous project [SocketIOChatDemo], which is an example of a web application using *socket.io* library.
 
 
 Following the [Microservices architecture], the system consists on two services that run in separate containers:
