@@ -27,7 +27,7 @@ $ docker-compose up
 + [SocketIOChatDemo]: Chat web application.
 + [node.js]: Server enviroment.
 + [MongoDB]: NoSQL database system.
-+ [Mongmongoose]: MongoDB object modeling for *node.js*.
++ [mongoose]: MongoDB object modeling for *node.js*.
 + [docker-build]: Automated build of *Docker* images.
 + [docker-compose]: Automated configuration and run of multi-container *Docker* applications.
 
