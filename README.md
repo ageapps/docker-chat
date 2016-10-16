@@ -13,7 +13,7 @@ Following the [Microservices architecture], the system consists on two services 
 
 Yo can find a demo, working [here]
 
-![demo](./chat_demo.gif)
+![demo](https://github.com/ageapps/docker-chat/blob/master/chat_demo.gif?raw=true)
 
 ## Usage with git
 
