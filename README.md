@@ -27,9 +27,9 @@ $ docker-compose up
 
 ```groovy
 // run mongo service
-$ docker run -v "$(pwd)":/data --name mongo -d mongo mongod --smallfiles
+$ docker run -v "$(pwd)"/database:/data --name mongo_db -d mongo mongod --smallfiles
 // run docker-chat image
-$ docker run -d --name node_server -v "$(pwd)":/data --link mongo:mongo -p 8080:4000 ageapps/docker-chat
+$ docker run -d --name node_server -v "$(pwd)"/database:/data --link mongo_db:db -p 8080:4000 ageapps/docker-chat
 // connect in your browser to <host IP>:8080
 ```
 

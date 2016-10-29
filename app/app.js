@@ -123,9 +123,5 @@ app.io.on('connection', function(socket) {
     });
 });
 
-app.db.on('error', console.error.bind(console, 'connection error:'));
-app.db.once('open', function() {
-    console.log("Connected succesfully to MongoDB");
-});
 
 module.exports = app;
