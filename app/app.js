@@ -13,10 +13,6 @@ var app = express();
 app.io = require('socket.io')();
 app.users = new HashMap(); // Array with connected user
 
-// Set up mongo
-app.mongoose = require('mongoose');
-app.db = app.mongoose.connection;
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -93,7 +89,6 @@ app.io.on('connection', function(socket) {
             socket.broadcast.emit('chat message', sendedMessage, app.users.get(socket));
         });
     });
-
     socket.on('typing', function(isTyping, name) {
         //console.log('User: ' + name + " is typing " + isTyping);
         socket.broadcast.emit('typing', isTyping, name);

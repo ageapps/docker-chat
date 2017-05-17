@@ -1,17 +1,31 @@
-version: "2"
+version: "2.1"
 services:
   server:
-    build: .
+    build: ./app
     ports:
-      - "8080:4000"
+      - "8080:5000"
     volumes:
       - ./database:/data # volume in host -> $(pwd)/database
-    links:
-      - db
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - MONGO_USERNAME=node
+      - MONGO_PASSWORD=node
+      - MONGO_DATABASE=nodedb
+      - PORT=5000
+
   db:
-    image: mongo
+    build: ./mongo
+    environment:
+      - MONGO_DB_APP_PASSWORD=node
+      - MONGO_DB_APP_USERNAME=node
+      - MONGO_DB_APP_DATABASE=nodedb
+    # volumes:
+    #   - ./database:/data # volume in host -> $(pwd)/database
+    healthcheck:
+      test: ["CMD", "echo", "show dbs", "|", "mongo"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     command: mongod --smallfiles
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./database:/data # volume in host -> $(pwd)/database

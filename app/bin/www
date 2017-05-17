@@ -30,8 +30,6 @@ server.on('listening', onListening);
 
 
 app.io.attach(server);
-app.mongoose.connect('mongodb://db:27017');
-
 
 
 /**
