@@ -5,7 +5,7 @@ services:
       context: ./app
       dockerfile: Dockerfile.debug
     ports:
-      - "8080:4000"
+      - "8888:4000"
     volumes:
       - ./app:/app
     depends_on:
