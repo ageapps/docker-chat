@@ -1,0 +1,49 @@
+<!-- WHOLE APP FRAME -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <% include ../views/templates/head %>
+        </style>
+</head>
+
+<body>
+    <section class="container">
+
+        <h1>Welcome to
+            <%= title %>
+                <a href="https://github.com/ageapps/SocketIOChatDemo" target="_blank"><img src="/images/github.png" alt="GitHub account" width="35px" /></a>
+        </h1>
+        <p>In host:
+            <%= host %>
+        </p>
+
+
+        <div class="container" id="login_container">
+            <div class="row">
+                <div class="Absolute-Center is-Responsive">
+                    <div class="col-sm-12 col-md-10 col-md-offset-1 text-center">
+                        <h3>Enter your Name</h3>
+                        <form name="login-form" id="login_form" method="post" action="/">
+                            <div class="form-group input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <input class="form-control" type="text" id="user" required name="user" placeholder="..." />
+                            </div>
+                            <div class="form-group">
+                                <button type="submit button" class="btn btn-def btn-block">Login</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+
+    <% include ../views/templates/scripts %>
+
+
+</body>
+
+</html>
