@@ -3,7 +3,7 @@ FROM node:9.1-slim
 MAINTAINER Adrián García Espinosa "age.apps.dev@gmail.com"
 
 # Create app directory
-WORKDIR /server
+WORKDIR /app
 
 # nodemon for development
 RUN npm install -gq nodemon
@@ -13,7 +13,7 @@ COPY package.json ./
 RUN npm install -q
 
 # Bundle app source
-COPY . /server
+COPY . /app
 
 # EXPOSE '${PORT}'
 

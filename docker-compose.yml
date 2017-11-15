@@ -1,11 +1,12 @@
 version: "2.1"
 services:
-  server:
+  app:
     build: ./app
+    image: ageapps/docker-chat:app
     ports:
       - "8080:5000"
     volumes:
-      - ./database:/data # volume in host -> $(pwd)/database
+      - ./app:/app # volume in host -> $(pwd)/database
     depends_on:
       db:
         condition: service_healthy
@@ -18,12 +19,17 @@ services:
 
   db:
     build: ./mongo
+    image: ageapps/docker-chat:mongo
+    volumes:
+      - ./database:/data # volume in host -> $(pwd)/database
     environment:
       - MONGO_DB_APP_PASSWORD=node
       - MONGO_DB_APP_USERNAME=node
       - MONGO_DB_APP_DATABASE=nodedb
     # volumes:
     #   - ./database:/data # volume in host -> $(pwd)/database
+    ports:
+      - "27017:27017"    
     healthcheck:
       test: ["CMD", "echo", "show dbs", "|", "mongo"]
       interval: 30s

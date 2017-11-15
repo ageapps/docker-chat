@@ -1,4 +1,4 @@
-FROM mongo:3.5
+FROM mongo:3.2
 
 MAINTAINER Adrián García Espinosa "age.apps.dev@gmail.com"
 
