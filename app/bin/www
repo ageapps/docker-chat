@@ -11,7 +11,7 @@ var http = require('http');
 /**
  * Get port from environment and store in Express.
  */
-var port = normalizePort(process.env.PORT || '4000');
+var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
@@ -19,6 +19,17 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+const amqp_adapter = require('socket.io-amqp');
+if (!!process.env.RABBIT_HOST){
+    const rabbit_host = process.env.RABBIT_HOST || 'rabbit';
+
+    app.io.adapter(amqp_adapter(`amqp://${rabbit_host}`, {
+        prefix: 'docker-chat',
+        useInputExchange: true,
+        channelSeperator: '/'
+    }));
+}
 
 /**
  * Listen on provided port, on all network interfaces.
