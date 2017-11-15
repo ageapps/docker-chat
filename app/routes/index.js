@@ -46,4 +46,8 @@ router.get('/logout', function (req, res, next) {
     res.redirect('/');
 });
 
+router.get('/healthcheck', function (req, res, next) {
+    res.send(200);
+});
+
 module.exports = router;

@@ -1,0 +1,57 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: docker-chat
+spec:
+  selector:
+    app: backend
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 3000
+      name: http
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: docker-chat
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: backend
+        tier: backend
+    spec:
+      containers:
+        - name: "ageapps/docker-chat:app"
+          # image: "eu.gcr.io/mashmetv/backend:ws-redis"
+          imagePullPolicy: Always
+          env:
+          - name: PORT
+            value: "3000"
+          - name: RABBIT_HOST
+            value: "mashme:cacafuti@10.1.1.9/"
+
+          ######   DEVELOPMENT VARIABLE #######
+          - name: REDEPLOY_VAR
+            value: "v1"
+
+
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 3000
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 3000
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            periodSeconds: 10
+          ports:
+            - containerPort: 3000
+          command: ["bash", "-c", "./node_modules/nodemon/bin/nodemon.js ./bin/www"]

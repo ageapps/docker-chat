@@ -1,0 +1,36 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mongo
+spec:
+  selector:
+    app: mongo
+    tier: database
+  ports:
+    - protocol: TCP
+      port: 27017
+      name: http
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongo
+        tier: database
+    spec:
+      containers:
+        - name: "mongo-database"
+          image: "ageapps/docker-chat:mongo"
+          imagePullPolicy: Always
+          env:
+          ######   DEVELOPMENT VARIABLE #######
+          - name: REDEPLOY_VAR
+            value: "v1"
+          ports:
+            - containerPort: 27017
+          command: ['/bin/bash', /app/entrypoint.sh]

@@ -14,6 +14,7 @@ services:
       - MONGO_PASSWORD=node
       - MONGO_DATABASE=nodedb
       - PORT=5000
+    command: [nodemon, ./bin/www]
 
   db:
     build: ./mongo

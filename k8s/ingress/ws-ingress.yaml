@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ws-ingress
+  annotations:
+    # NOTE(ageapps): Annotation for kube-lego
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+  backend:
+    serviceName: app
+    servicePort: 3000
+  # tls:
+  # - hosts:
+  #   - www.dockerchat.cf
+  #   secretName: proxy-tls
+  rules:
+  - http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: docker-chat
+          servicePort: 3000
