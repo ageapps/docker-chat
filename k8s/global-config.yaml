@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global-config
+data:
+  db.username: "node"
+  db.password: "node"
+  db.database: "nodedb"
+  app.rabbit_host: "rabbit"
+  app.port: "3000"

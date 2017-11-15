@@ -29,10 +29,31 @@ spec:
           imagePullPolicy: Always
           env:
           - name: PORT
-            value: "3000"
+            valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: app.port
           - name: RABBIT_HOST
-            value: "rabbit"
+            valueFrom:
+              configMapKeyRef:
+                name: global-config
+                key: app.rabbit_host
 
+          - name: MONGO_PASSWORD
+            valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: db.password
+          - name: MONGO_USERNAME
+            valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: db.username
+          - name: MONGO_DATABASE
+            valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: db.database
           ######   DEVELOPMENT VARIABLE #######
           - name: REDEPLOY_VAR
             value: "v1"
@@ -54,4 +75,4 @@ spec:
             periodSeconds: 10
           ports:
             - containerPort: 3000
-          command: ["bash", "-c", "./node_modules/nodemon/bin/nodemon.js ./bin/www"]
+          command: ["bash", "-c", "nodemon ./bin/www"]

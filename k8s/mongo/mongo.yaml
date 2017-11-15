@@ -28,6 +28,23 @@ spec:
           image: "ageapps/docker-chat:mongo"
           imagePullPolicy: Always
           env:
+          - name: MONGO_DB_APP_PASSWORD
+            valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: db.password
+          - name: MONGO_DB_APP_USERNAME
+            valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: db.username
+          - name: MONGO_DB_APP_DATABASE
+            valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: db.database
+
+              
           ######   DEVELOPMENT VARIABLE #######
           - name: REDEPLOY_VAR
             value: "v1"
