@@ -7,11 +7,10 @@ var bodyParser = require('body-parser');
 var express_session = require('express-session');
 var routes = require('./routes/index');
 var mongoose = require('mongoose');
+const MongoStore = require('connect-mongo')(express_session);
 
 var app = express();
 
-var connectedUsers = []; // Array with connected users
-app.socketMap = {}; // Map with connected user and sockets
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,14 +25,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 
-var session = express_session({
-    secret: "SocketIoExample",
-    resave: false,
-    saveUninitialized: true
-});
 
-app.use(session);
-app.session = session;
 app.use(express.static(path.join(__dirname, 'public')));
 
 var port = process.env.DB_PORT || '27017';
@@ -57,6 +49,18 @@ mongoose.connect(url, {
 
 var db = mongoose.connection;
 
+
+var session = express_session({
+    secret: "SocketIoExample",
+    resave: false,
+    saveUninitialized: true,
+    store: new MongoStore({ mongooseConnection: db })
+});
+
+app.use(session);
+app.session = session;
+
+
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
     console.log("Connected to MongoDB to: " + url);
@@ -64,7 +68,6 @@ db.once('open', function () {
 
 
 app.use(function (req, res, next) {
-    res.locals.userCount = connectedUsers.length;
     res.locals.session = req.session;
     next();
 });
