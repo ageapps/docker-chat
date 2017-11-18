@@ -4,14 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var session = require('express-session');
+var express_session = require('express-session');
 var routes = require('./routes/index');
 var mongoose = require('mongoose');
 
 var app = express();
 
-// Set up socket.io in server
-app.io = require('socket.io')();
 var connectedUsers = []; // Array with connected users
 app.socketMap = {}; // Map with connected user and sockets
 
@@ -27,13 +25,16 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
-app.use(session({
+
+var session = express_session({
     secret: "SocketIoExample",
     resave: false,
     saveUninitialized: true
-}));
-app.use(express.static(path.join(__dirname, 'public')));
+});
 
+app.use(session);
+app.session = session;
+app.use(express.static(path.join(__dirname, 'public')));
 
 var port = process.env.DB_PORT || '27017';
 var host = process.env.DB_HOST || 'db';
@@ -100,71 +101,6 @@ app.use(function (err, req, res, next) {
     res.render('error', {
         message: err.message,
         error: {}
-    });
-});
-
-// start listen with socket.io
-app.io.on('connection', function (socket) {
-    var userController = require('./controllers/user_controller');
-    console.log('Socket Connected');
-
-
-    socket.on('chat message', function (msg) {
-        console.log("message from: " + socket.id + " - " + app.socketMap[socket.id]);
-        userController.addMsg(app.socketMap[socket.id], msg, function (sendedMessage) {
-            // console.log(sendedMessage);
-            socket.broadcast.emit('chat message', sendedMessage, app.socketMap[socket.id]);
-        });
-    });
-    socket.on('typing', function (isTyping, name) {
-        //console.log('User: ' + name + " is typing " + isTyping);
-        socket.broadcast.emit('typing', isTyping, name);
-    });
-
-    socket.on('new user', function (user) {
-        app.socketMap[socket.id] = user;
-
-        if (connectedUsers.indexOf(user) < 0) {
-            connectedUsers.push(user);
-            console.log("New User CONNECTED ")
-
-        }
-        connectedUsers[connectedUsers.indexOf(user)]
-        console.log('User: ' + app.socketMap[socket.id] + " CONNECTED");
-
-        console.log("Number of users: " + connectedUsers.length);
-        app.io.emit('connection on off', (connectedUsers.length));
-        userController.getUser(user, function (foundUser) {
-            if (foundUser && foundUser.messages) {
-                foundUser.messages.forEach(function (msg) {
-                    // send them just to me
-                    app.io.to(socket.id).emit('old message', msg, app.socketMap[socket.id]);
-                });
-            }
-        });
-    });
-
-
-    socket.on('disconnect', function () {
-        console.log('User ' + app.socketMap[socket.id] + ' DISCONNECTED');
-        console.log(connectedUsers.indexOf(app.socketMap[socket.id]) >= 0);
-        opennedSessions = 0;
-        for (socketId in app.socketMap) {
-            if (app.socketMap[socket.id] == app.socketMap[socketId]) {
-                opennedSessions++;
-            }
-            if (opennedSessions >= 2) {
-                break;
-            }
-        }
-        if (opennedSessions <= 1){
-            connectedUsers.splice(connectedUsers.indexOf(app.socketMap[socket.id]),1);
-        }
-
-        delete app.socketMap[socket.id];
-
-        console.log("Number of users: " + connectedUsers.length);
-        app.io.emit('connection on off', (connectedUsers.length));
     });
 });
 

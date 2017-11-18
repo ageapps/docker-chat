@@ -9,6 +9,8 @@
         display: none;
       }
     </style>
+        <script src="/client.js"></script>
+        
 </head>
 
 <body>
@@ -16,7 +18,9 @@
 
     <h1>Welcome to
       <%= title %>
-        <a href="https://github.com/ageapps/SocketIOChatDemo" target="_blank"><img src="/images/github.png" alt="GitHub account" width="35px" /></a>
+        <a href="https://github.com/ageapps/SocketIOChatDemo" target="_blank">
+          <img src="/images/github.png" alt="GitHub account" width="35px" />
+        </a>
     </h1>
     <p>In host:
       <%= host %>
@@ -26,21 +30,51 @@
     <div class="chat_container">
       <div class="panel panel-default panel-dark container">
         <div class="panel-body pannel-body-left col-sm-6 col-xs-12 ">
-          <strong id="user_name"></strong> <a href="/logout">logout</a>
+          <strong id="user_name"><%= session.user.name %></strong>
+          <a href="/logout">logout</a>
         </div>
         <div class="panel-body pannel-body-right col-sm-6 col-xs-12 ">
           <small id="user_typing"></small> People connected
-          <span class="badge" id="users_connected"><%= number_connected %></span>
+          <span class="badge" id="users_connected">
+            <%= number_connected %>
+          </span>
         </div>
       </div>
       <div id="messages_container">
         <div id="old_messages_container">
-          <ul class="messages" id="old-messages"></ul>
+          <ul class="messages" id="old-messages">
+              <li style="display: none"> 
+                  <div class="direct-chat-text">
+                      <div class="chat_heading">
+                        <h5 class="chat_person"></h5>
+                        <span class="chat_hour"></span>
+                      </div>
+                      <p class="chat_text"></p>
+                    </div>
+              </li>
+          </ul>
           <div class="divider text-center">
-            Old messages
+            Last messages
           </div>
         </div>
-        <ul class="messages" id="new-messages"></ul>
+        <ul class="messages" id="new-messages">
+          <li class="message" style="display: none"> 
+            <div class="direct-chat-text">
+            <div class="chat_heading">
+              <h5 class="chat_person"></h5>
+              <span class="chat_hour"></span>
+            </div>
+            <p class="chat_text"></p>
+          </div>
+        </li>
+        <li class="control" style="display: none">
+          <div class="badge">
+              <span class="chat_heading"></span>&nbsp;<span class="chat_text"></span>
+              <span class="chat_hour"></span>
+          </div>
+            
+        </li>
+        </ul>
       </div>
     </div>
 
@@ -55,135 +89,6 @@
 
 
   <% include ../views/templates/scripts %>
-
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script type="text/javascript">
-    </script>
-
-    <script type="text/javascript">
-      function appendMessage(mine, msg, name) {
-        var panelType = "";
-        var person = "me";
-        var time = "";
-        var day = new Date(msg.createdAt);
-        time = day.getHours() + ":" + day.getMinutes();
-        if (!mine) {
-          panelType = "_dark";
-          person = name;
-        }
-        $('#new-messages').append('<li class=\"' + panelType + '\"> <div class=\"direct-chat-text' + panelType +
-          '\"><h5 class=\"chat_heading\">' + person + ' <span class=\"chat_hour\"> ' + time + '</span></h5>' +
-          '<p>' + msg.text + '</p></div></li>')
-      }
-
-      function appendOldMessage(msg) {
-        var day = new Date(msg.createdAt);
-        var time = day.getHours() + ":" + day.getMinutes();
-        $('#old-messages').append(
-          '<li> <div class=\"direct-chat-text\"><h5 class=\"chat_heading\">me <span class=\"chat_hour\"> ' + time +
-          '</span></h5>' +
-          '<p>' + msg.text + '</p></div></li>')
-      }
-
-      //user is "finished typing," do something
-      function doneTyping() {
-        socket.emit("typing", false, myName);
-      }
-    </script>
-    <script type="text/javascript">
-      var myName = "";
-      $(function () {
-        <% if (session.user) {%>
-        myName = "<%= session.user.name %>";
-        socket.emit('new user', myName);
-        $('#user_name').text(myName);
-        <% } %>
-      });
-    </script>
-
-    <script type="text/javascript">
-      var socket = io();
-
-
-      $('#chat_input').submit(function () {
-        if ($('#m').val() && $('#m').val() != "") {
-          var date = new Date();
-          var message = {
-            text: $('#m').val(),
-            createdAt: date.toString()
-          };
-          socket.emit('chat message', message);
-          appendMessage(true, message);
-          $('#m').val('');
-        }
-        return false;
-      });
-
-      socket.on('connect', function () {
-            console.log('connected');
-        });
-        socket.on('connecting', function () {
-            console.log('connecting');
-        });
-        socket.on('disconnect', function () {
-            console.log('disconnect');
-        });
-        socket.on('connect_failed', function () {
-            console.log('connect_failed');
-        });
-        socket.on('error', function (err) {
-            console.log('error: ' + err);
-        });
-        socket.on('reconnect_failed', function () {
-            console.log('reconnect_failed');
-        });
-        socket.on('reconnect', function () {
-            console.log('reconnected ');
-        });
-        socket.on('reconnecting', function () {
-            console.log('reconnecting');
-        });
-
-      socket.on('old message', function (msg, name) {
-        $("#old_messages_container").css("display", "block");
-        appendOldMessage(msg);
-      });
-      socket.on('connection on off', function (number) {
-        $('#users_connected').text(number);
-      });
-
-      socket.on('chat message', function (msg, name) {
-        console.log(name + " me: " + myName);
-        appendMessage(name == myName, msg, name);
-      });
-
-      socket.on('typing', function (isTyping, name) {
-        var text = ""
-        if (isTyping) {
-          text = name + " is typing..."
-        }
-        $('#user_typing').text(text);
-      });
-
-
-
-      //setup before functions
-      var typingTimer; //timer identifier
-      var doneTypingInterval = 3000; //time in ms, 5 second for example
-      var $input = $('#m');
-
-      //on keyup, start the countdown
-      $input.on('keyup', function () {
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(doneTyping, doneTypingInterval);
-      });
-
-      //on keydown, clear the countdown
-      $input.on('keydown', function () {
-        socket.emit("typing", true, myName);
-        clearTimeout(typingTimer);
-      });
-    </script>
 
 </body>
 

@@ -1,4 +1,7 @@
+'use strict';
+
 var models = require('../models');
+var debug = require('debug')('docker-chat:models/user');
 
 
 exports.getUser = function(username, cb) {
@@ -9,7 +12,7 @@ exports.getUser = function(username, cb) {
             if (user.messages.length > 5) {
                 user.messages.splice(0,user.messages.length - 5);
             }
-
+            debug(`Existing user ${user.name}`);
             cb(user);
         } else {
             addUser(username, cb);
@@ -40,7 +43,7 @@ var addUser = function(userName,cb) {
 
     newUser.save(function(err, user) {
         if (err) return console.error(err);
-        console.log(user.name + " -> SAVED");
+        debug(`User ${user.name} saved`);
         cb(user);
     });
 };

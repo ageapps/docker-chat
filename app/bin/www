@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('DockerChat:server');
 var http = require('http');
+var socketio = require('../controllers/socketio');
 
 /**
  * Get port from environment and store in Express.
@@ -20,16 +21,27 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-const amqp_adapter = require('socket.io-amqp');
-if (!!process.env.RABBIT_HOST){
+// Set up socket.io in server
+var io = require('socket.io')(server);
+var socket_express_session = require('socket.io-express-session');
+io.use(
+    socket_express_session(app.session), {
+        autoSave: true
+    }); // session support
+
+if (!!process.env.RABBIT_HOST) {
+    const amqp_adapter = require('socket.io-amqp');
     const rabbit_host = process.env.RABBIT_HOST || 'rabbit';
 
     app.io.adapter(amqp_adapter(`amqp://${rabbit_host}`, {
-        prefix: 'docker-chat',
+        prefix: 'dockerchat',
         useInputExchange: true,
         channelSeperator: '/'
     }));
 }
+// init socketio controller
+socketio.init(io);
+
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -39,8 +51,9 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+// Set up socket.io in server
 
-app.io.attach(server);
+//app.io.attach(server);
 
 
 /**

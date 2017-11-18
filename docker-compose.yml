@@ -11,10 +11,12 @@ services:
       db:
         condition: service_healthy
     environment:
+      - DEBUG=docker-chat:*
       - MONGO_USERNAME=node
       - MONGO_PASSWORD=node
       - MONGO_DATABASE=nodedb
       - PORT=5000
+      # - RABBIT_HOST=rabbit
     command: [nodemon, ./bin/www]
 
   db:
@@ -36,3 +38,8 @@ services:
       timeout: 10s
       retries: 3
     command: mongod --smallfiles
+
+  # rabbit:
+  #   image: rabbitmq:3-management
+  #   ports:
+  #     - "15672:15672"

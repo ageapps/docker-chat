@@ -3,6 +3,7 @@ var router = express.Router();
 var path = require('path');
 var os = require("os");
 var userController = require('../controllers/user_controller');
+var debug = require('debug')('docker-chat:routes');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -20,9 +21,9 @@ router.get('/', function (req, res, next) {
 /* POST home page. */
 router.post('/', function (req, res, next) {
     user = req.body.user;
-    console.log('User: ' + user + " LOGIN");
+    debug('User: ' + user + " LOGIN");
     userController.getUser(user, function (foundUser) {
-        console.log(foundUser.name);
+        debug(foundUser.name);
         req.session.user = foundUser;
         res.redirect('/');
     });

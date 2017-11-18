@@ -7,10 +7,13 @@ body {
     font: 13px Helvetica, Arial;
     color: #757575;
 }
-
+strong {
+    color: #E64A19;
+    font-weight: 700;
+}
 .divider {
-    padding: 20px;
-    background: rgba(117, 117, 117, 0.65);
+    padding: 5px;
+    background: #777;
     color: #fff;
     font-size: medium;
 }
@@ -61,7 +64,9 @@ section h1 {
 .messages li {
     padding: 5px 10px;
 }
-
+.control{
+    text-align: center;
+}
 
 /*#messages li:nth-child(odd) {
     background: #eee;
@@ -113,10 +118,15 @@ section h1 {
     max-width: 400px;
     padding: 20px;
 }
-
-.chat_heading, strong {
+.chat_heading{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.chat_heading, .chat_person {
     color: #E64A19;
     font-weight: 700;
+    margin-right: 10px
 }
 
 .chat_heading .chat_hour {
