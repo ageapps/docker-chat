@@ -34,8 +34,7 @@ exports.init = function (io) {
         });
         
         /*
-         When a user joins the channel, publish it to everyone (including myself) using
-         Redis' 'pub' client we created earlier.
+         When a user joins the channel, publish it to everyone (including myself)
          Notice that we are getting user's name from session.
          */
         socket.on('user', function (myName) {
@@ -112,64 +111,3 @@ exports.init = function (io) {
         }
     });
 }
-
-
-// socket.on('chat message', function (msg) {
-//     console.log("message from: " + socket.id + " - " + app.socketMap[socket.id]);
-//     userController.addMsg(app.socketMap[socket.id], msg, function (sendedMessage) {
-//         // console.log(sendedMessage);
-//         socket.broadcast.emit('chat message', sendedMessage, app.socketMap[socket.id]);
-//     });
-// });
-
-
-// socket.on('typing', function (isTyping, name) {
-//     //console.log('User: ' + name + " is typing " + isTyping);
-//     socket.broadcast.emit('typing', isTyping, name);
-// });
-
-// socket.on('new user', function (user) {
-//     app.socketMap[socket.id] = user;
-
-//     if (connectedUsers.indexOf(user) < 0) {
-//         connectedUsers.push(user);
-//         console.log("New User CONNECTED ")
-
-//     }
-//     connectedUsers[connectedUsers.indexOf(user)]
-//     console.log('User: ' + app.socketMap[socket.id] + " CONNECTED");
-
-//     console.log("Number of users: " + connectedUsers.length);
-//     app.io.emit('connection on off', (connectedUsers.length));
-//     userController.getUser(user, function (foundUser) {
-//         if (foundUser && foundUser.messages) {
-//             foundUser.messages.forEach(function (msg) {
-//                 // send them just to me
-//                 app.io.to(socket.id).emit('old message', msg, app.socketMap[socket.id]);
-//             });
-//         }
-//     });
-// });
-
-
-// socket.on('disconnect', function () {
-//     console.log('User ' + app.socketMap[socket.id] + ' DISCONNECTED');
-//     console.log(connectedUsers.indexOf(app.socketMap[socket.id]) >= 0);
-//     opennedSessions = 0;
-//     for (socketId in app.socketMap) {
-//         if (app.socketMap[socket.id] == app.socketMap[socketId]) {
-//             opennedSessions++;
-//         }
-//         if (opennedSessions >= 2) {
-//             break;
-//         }
-//     }
-//     if (opennedSessions <= 1) {
-//         connectedUsers.splice(connectedUsers.indexOf(app.socketMap[socket.id]), 1);
-//     }
-
-//     delete app.socketMap[socket.id];
-
-//     console.log("Number of users: " + connectedUsers.length);
-//     app.io.emit('connection on off', (connectedUsers.length));
-// });
