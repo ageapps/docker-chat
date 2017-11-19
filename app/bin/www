@@ -26,7 +26,6 @@ var server = http.createServer(app);
 /**
  * Create socket io server.
  */
-const amqp_adapter = require('socket.io-amqp');
 
 const redis_host = process.env.REDIS_HOST || 'redis';
 const redis_port = process.env.REDIS_PORT || '6379';
