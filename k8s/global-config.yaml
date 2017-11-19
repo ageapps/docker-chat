@@ -3,8 +3,10 @@ kind: ConfigMap
 metadata:
   name: global-config
 data:
-  db.username: "node"
-  db.password: "node"
-  db.database: "nodedb"
-  app.redis_host: "redis"
+  db.username: node
+  db.password: node
+  db.database: nodedb
+  db.port: "27017"
+  db.host: mongo
+  app.redis_host: redis
   app.port: "3000"
