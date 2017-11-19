@@ -21,23 +21,33 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+
+
+/**
+ * Create socket io server.
+ */
+const amqp_adapter = require('socket.io-amqp');
+
+const redis_host = process.env.REDIS_HOST || 'redis';
+const redis_port = process.env.REDIS_PORT || '6379';
+
+
 // Set up socket.io in server
 var io = require('socket.io')(server);
+
+
+
 var socket_express_session = require('socket.io-express-session');
 io.use(
     socket_express_session(app.session), {
         autoSave: true
     }); // session support
 
-if (!!process.env.RABBIT_HOST) {
-    const amqp_adapter = require('socket.io-amqp');
-    const rabbit_host = process.env.RABBIT_HOST || 'rabbit';
+if (!!process.env.REDIS_HOST) {
+  
+    const redis = require('socket.io-redis');
+    io.adapter(redis({ host: redis_host, port: redis_port }));
 
-    app.io.adapter(amqp_adapter(`amqp://${rabbit_host}`, {
-        prefix: 'dockerchat',
-        useInputExchange: true,
-        channelSeperator: '/'
-    }));
 }
 // init socketio controller
 socketio.init(io);

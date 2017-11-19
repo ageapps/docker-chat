@@ -9,7 +9,6 @@ var MESSAGE_TYPE = {
     typing: 'typing'
 };
 
-
 exports.init = function (io) {
     var connectedUsers = []; // Array with connected users' ids
     var socketMap = {}; // Map with connected user and sockets
