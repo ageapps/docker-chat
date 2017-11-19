@@ -1,0 +1,38 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 6379
+      name: http
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        tier: backend
+    spec:
+      containers:
+        - name: "redis"
+          image: "redis:3.2.9-alpine"
+          imagePullPolicy: Always
+          env:
+
+          ######   DEVELOPMENT VARIABLE #######
+          - name: REDEPLOY_VAR
+            value: 'v1'
+
+          ports:
+            - containerPort: 6379    

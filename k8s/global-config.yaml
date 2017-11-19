@@ -6,5 +6,5 @@ data:
   db.username: "node"
   db.password: "node"
   db.database: "nodedb"
-  app.rabbit_host: "rabbit"
+  app.redis_host: "redis"
   app.port: "3000"

@@ -4,27 +4,35 @@ metadata:
   name: docker-chat
 spec:
   selector:
-    app: backend
+    app: docket-chat
     tier: backend
   ports:
     - protocol: TCP
       port: 3000
       name: http
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: docker-chat
+  metadata:
+      labels:
+        app: docker-chat
+        tier: backend
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: docker-chat
   template:
     metadata:
       labels:
-        app: backend
+        app: docker-chat
         tier: backend
     spec:
       containers:
-        - name: "ageapps/docker-chat:app"
+        - name: "docker-chat"
+          image: "ageapps/docker-chat:app"
           # image: "eu.gcr.io/mashmetv/backend:ws-redis"
           imagePullPolicy: Always
           env:
@@ -33,11 +41,13 @@ spec:
             configMapKeyRef:
               name: global-config
               key: app.port
-          - name: RABBIT_HOST
+          - name: DEBUG
+            value: "docker-chat:*"
+          - name: REDIS_HOST
             valueFrom:
               configMapKeyRef:
                 name: global-config
-                key: app.rabbit_host
+                key: app.redis_host
 
           - name: MONGO_PASSWORD
             valueFrom:
