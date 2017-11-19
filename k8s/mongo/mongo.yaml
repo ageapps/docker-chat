@@ -11,10 +11,14 @@ spec:
       port: 27017
       name: http
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta1  # for versions before 1.8.0 use apps/v1beta1
 kind: Deployment
 metadata:
   name: mongo
+  metadata:
+      labels:
+        app: mongo
+        tier: database
 spec:
   replicas: 1
   template:
