@@ -10,15 +10,14 @@ var createRoom = function (name, cb) {
     });
     newRoom.save(function (err, room) {
         if (err) return console.error(err);
-        debug(`Chat ${room.name} saved`);
+        debug(`Room ${room.name} saved`);
         cb(room);
     });
 };
 exports.getRoom = function (name, cb) {
-
     models.Room.findByName(name, function (err, room) {
         if (room) {
-            debug(`Existing chat ${room.name}`);
+            debug(`Existing room ${room}`);
             cb(room);
         } else {
             createRoom(name, cb);

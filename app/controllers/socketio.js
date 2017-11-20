@@ -11,8 +11,6 @@ var MESSAGE_TYPE = {
 };
 
 exports.init = function (io) {
-    var connectedUsers = []; // Array with connected users' ids
-    var socketMap = {}; // Map with connected user and sockets
     var currentRoom = {}; // Map with connected user and sockets
 
     // start listen with socket.io
@@ -56,13 +54,17 @@ exports.init = function (io) {
                 debug(`User <${user.name}> joined room <${room}>`);
                 var socketRoom = io.sockets.adapter.rooms[room];
                 socketRoom.name = room;
+                currentRoom.name = room;
+
                 debug(`Room used ${JSON.stringify(socketRoom)}`);
                 broadcastMessage('chat', MESSAGE_TYPE.control, `${user.name} joined the chat`);
 
                 roomController.getRoom(socketRoom.name, function (thisRoom) {
+                    debug(`Room <${JSON.stringify(thisRoom)}>`);
+
                     thisRoom.connectedUser(user._id, function (room) {
                         currentRoom = room;
-                        debug("Number of users: " + connectedUsers.length);
+                        debug("Number of users: " + room.connected.length);
                         broadcastMessage('onof', MESSAGE_TYPE.control, `${room.connected.length}`);
                     });
                 });
@@ -88,7 +90,7 @@ exports.init = function (io) {
                 thisRoom.disconnectedUser(user._id, function (room) {
                     currentRoom = room;
 
-                    debug("Number of users: " + connectedUsers.length);
+                    debug("Number of users: " + room.connected.length);
                     broadcastMessage('onof', MESSAGE_TYPE.control, `${room.connected.length}`);
                 });
             });
@@ -97,7 +99,7 @@ exports.init = function (io) {
         function broadcastMessage(channel, action, msg) {
             var message = getFormatedMessage(action, msg, socket);
             debug(`Broadcast message in channel: ${channel}: ${JSON.stringify(message)}`);
-            io.emit(channel, message);
+            io.in(currentRoom.name).emit(channel, message);
         }
 
         function getFormatedMessage(action, msg) {
