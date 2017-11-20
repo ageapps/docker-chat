@@ -1,9 +1,10 @@
 $(document).ready(function () {
     var socket = io();
     var myname;
+    var defaultRoom = 'default';
     if ($('#user_name').text()){
         myName = $('#user_name').text();
-        socket.emit('user', myName);
+        socket.emit('room', defaultRoom);
     } else{
         window.location.replace("/logout");
     }
