@@ -5,7 +5,7 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('DockerChat:server');
+var debug = require('debug')('docker-chat:server');
 var http = require('http');
 var socketio = require('../controllers/socketio');
 
@@ -21,32 +21,19 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-
-
-/**
- * Create socket io server.
- */
-
-const redis_host = process.env.REDIS_HOST || 'redis';
-const redis_port = process.env.REDIS_PORT || '6379';
-
-
 // Set up socket.io in server
 var io = require('socket.io')(server);
-
-
-
+var adapters = require('../adapters');
 var socket_express_session = require('socket.io-express-session');
+
 io.use(
     socket_express_session(app.session), {
         autoSave: true
     }); // session support
 
-if (!!process.env.REDIS_HOST) {
-  
-    const redis = require('socket.io-redis');
-    io.adapter(redis({ host: redis_host, port: redis_port }));
-
+if (!!process.env.SCALABLE) {
+    debug('Using SCALABLE MODE');
+    io.adapter(adapters.getAdapter());
 }
 // init socketio controller
 socketio.init(io);
@@ -59,11 +46,6 @@ socketio.init(io);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
-// Set up socket.io in server
-
-//app.io.attach(server);
-
 
 /**
  * Normalize a port into a number, string, or false.

@@ -1,4 +1,4 @@
-FROM node:9.1-slim
+FROM node:9.2
 
 MAINTAINER Adrián García Espinosa "age.apps.dev@gmail.com"
 

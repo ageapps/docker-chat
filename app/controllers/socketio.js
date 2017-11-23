@@ -10,6 +10,7 @@ var MESSAGE_TYPE = {
     typing: 'typing'
 };
 
+
 exports.init = function (io) {
     var currentRoom = {}; // Map with connected user and sockets
 
@@ -50,29 +51,32 @@ exports.init = function (io) {
                     });
                 }
                 socket.user = user._id;
-                socket.join(room);
-                debug(`User <${user.name}> joined room <${room}>`);
-                var socketRoom = io.sockets.adapter.rooms[room];
-                socketRoom.name = room;
-                currentRoom.name = room;
+                debug(`Roomssss <${JSON.stringify(io.sockets.adapter.rooms)}>`);
+                socket.join(room, function () {
 
-                debug(`Room used ${JSON.stringify(socketRoom)}`);
-                broadcastMessage('chat', MESSAGE_TYPE.control, `${user.name} joined the chat`);
+                    var socketRoom = io.sockets.adapter.rooms[room];
+                    socketRoom.name = room;
+                    currentRoom.name = room;
+                    debug(`User <${user.name}> joined room <${JSON.stringify(io.sockets.adapter.rooms)}>`);
 
-                roomController.getRoom(socketRoom.name, function (thisRoom) {
-                    debug(`Room <${JSON.stringify(thisRoom)}>`);
+                    debug(`Room used ${JSON.stringify(socketRoom)}`);
+                    broadcastMessage('chat', MESSAGE_TYPE.control, `${user.name} joined the chat`);
 
-                    thisRoom.connectedUser(user._id, function (room) {
-                        currentRoom = room;
-                        debug("Number of users: " + room.connected.length);
-                        broadcastMessage('onof', MESSAGE_TYPE.control, `${room.connected.length}`);
+                    roomController.getRoom(currentRoom.name, function (thisRoom) {
+                        debug(`Room <${JSON.stringify(thisRoom)}>`);
+
+                        thisRoom.connectedUser(user._id, function (room) {
+                            currentRoom = room;
+                            debug("Number of users: " + room.connected.length);
+                            broadcastMessage('onof', MESSAGE_TYPE.control, `${room.connected.length}`);
+
+                        });
                     });
                 });
+
             });
-            
-
-
         });
+        
 
         socket.on('typing', function (isTyping) {
             var user = socket.handshake.session.user;
@@ -83,6 +87,9 @@ exports.init = function (io) {
 
         socket.on('disconnect', function () {
             var user = socket.handshake.session.user;
+            if (!user) {
+                return
+            }
             debug('User ' + user.name + ' DISCONNECTED');
             broadcastMessage('chat', MESSAGE_TYPE.control, `${user.name} left the chat`);
 

@@ -9,6 +9,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /dev/null:/traefik.toml
+
   app:
     build: ./app
     image: ageapps/docker-chat:app
@@ -28,14 +29,12 @@ services:
       - MONGO_USERNAME=node
       - MONGO_PASSWORD=node
       - MONGO_DATABASE=nodedb
-      # - SCALABLE=true
-      # - REDIS_HOST=redis
-      # - RABBIT_HOST=rabbit
-      # - KAFKA_HOST=kafka
-      # - NATS_HOST=nats
+      - SCALABLE=true
+      - KAFKA_HOST=kafka
     # ports:
     #   - 8080:3000
     command: [nodemon, ./bin/www]
+
   db:
     build: ./mongo
     image: ageapps/docker-chat:mongo
@@ -53,25 +52,3 @@ services:
       timeout: 10s
       retries: 3
     command: mongod --smallfiles
-  # redis:
-  #   image: redis
-  #   ports:
-  #     - "6379:6379"
-  # nats:
-  #   image: nats
-  #   ports:
-  #     - "4222:4222"
-  #     - "8222:8222"
-  #     - "6222:6222"
-  # natsboard:
-  #   image: urashidmalik/natsboard
-  #   environment:
-  #     - NATS_MONITOR_URL=http://nats:8222
-  #   ports:
-  #     - "3001:3001"
-  #     - "3000:3000"
-
-  # rabbit:
-  #   image: rabbitmq:3-management
-  #   ports:
-  #     - "15672:15672"
