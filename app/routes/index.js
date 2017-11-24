@@ -13,7 +13,8 @@ router.get('/', function (req, res, next) {
         res.render('index', {
             title: 'SocketIO Chat Demo',
             number_connected: req.userCount,
-            host: os.hostname()
+            host: os.hostname(),
+            parse: process.env.PARSE_MSG
         });
     }
 });

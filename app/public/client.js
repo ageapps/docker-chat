@@ -2,10 +2,14 @@ $(document).ready(function () {
     var socket = io();
     var myname;
     var defaultRoom = 'default';
-    if ($('#user_name').text()){
+    var parseMessages = !!$('#parse-flag').text();
+
+    console.log("Parse messages " + parseMessages);
+
+    if ($('#user_name').text()) {
         myName = $('#user_name').text();
-        socket.emit('room', defaultRoom);
-    } else{
+        sendMessage('room', defaultRoom)
+    } else {
         window.location.replace("/logout");
     }
 
@@ -16,7 +20,7 @@ $(document).ready(function () {
                 text: $('#m').val(),
                 createdAt: date.toString()
             };
-            socket.emit('chat', JSON.stringify(message));
+            sendMessage('chat', message)
             // appendMessage(true, message);
             $('#m').val('');
         }
@@ -48,21 +52,23 @@ $(document).ready(function () {
         console.log('reconnecting');
     });
 
-    socket.on('old message', function (msg) {
-        console.log('old message');
+    socket.on('old_message', function (_data) {
+        console.log('old message: ')
+        console.log(_data);
+        var msg = getMessage(_data);
 
         $("#old_messages_container").css("display", "block");
         appendOldMessage(msg);
     });
     socket.on('onof', function (_data) {
-        console.log('onof');
-        var data = JSON.parse(_data);
-        $('#users_connected').text(data.msg);
+        var msg = getMessage(_data);
+        console.log('onof: ' + msg);
+        $('#users_connected').text(msg);
     });
 
     socket.on('chat', function (_data) {
         console.log('chat');
-        var data = JSON.parse(_data);
+        var data = parseData(_data);
         var name = data.user.name;
         console.log(name + " me: " + myName);
         appendMessage(name == myName, data, name);
@@ -70,10 +76,10 @@ $(document).ready(function () {
 
     socket.on('typing', function (_data) {
         console.log('typing');
-        var data = JSON.parse(_data);
+        var data = parseData(_data);
         var text = ""
         if (data.msg) {
-            text = name + " is typing..."
+            text = data.user.name + " is typing..."
         }
         $('#user_typing').text(text);
     });
@@ -96,13 +102,41 @@ $(document).ready(function () {
 
     //on keydown, clear the countdown
     $input.on('keydown', function () {
-        if(!writing){
+        if (!writing) {
             writing = true;
-            socket.emit("typing", true);
+            sendMessage('typing',true);
         }
         clearTimeout(typingTimer);
     });
 
+    function stringifyData(data) {
+        if (parseMessages) {
+            return JSON.stringify(data);
+        }
+        return data;
+    }
+    function parseData(data) {
+        if (parseMessages) {
+            return JSON.parse(data);
+        }
+        return data;
+    }
+
+    function getMessage(data) {
+        return parseData(data).msg;
+    }
+
+    function sendMessage(channel, msg) {
+        var message = getFormatedMessage(msg);
+        console.log(` Send Message in channel: ${channel}: ${JSON.stringify(message)}`);
+        socket.emit(channel, message);
+    }
+
+    function getFormatedMessage(msg) {
+        return stringifyData({
+            msg: msg
+        });
+    }
     function appendMessage(mine, data, name) {
 
         var panelType = "";
@@ -126,19 +160,19 @@ $(document).ready(function () {
         // get a new message view from struct template
         var messageView = struct.clone();
         var text = '';
-        if(data.action === 'control'){
+        if (data.action === 'control') {
             text = data.msg;
             var today = new Date();
             time = today.getHours() + ":" + today.getMinutes();
             panelType = "";
-        } else{
+        } else {
             text = data.msg.text;
         }
         // contents
         messageView.find('.chat_hour').text(time);
         messageView.find('.chat_text').text(text);
-        messageView.find('.chat_person').text(person);     
-              
+        messageView.find('.chat_person').text(person);
+
         messageView.addClass(panelType);
         messageView.find('.direct-chat-text').addClass('direct-chat-text' + panelType);
         // append to container and scroll
@@ -172,7 +206,7 @@ $(document).ready(function () {
 
     //user is "finished typing," do something
     function doneTyping() {
-        socket.emit("typing", false);
+        sendMessage('typing', false);
         writing = false;
     }
 });

@@ -31,40 +31,8 @@ services:
       - MONGO_DATABASE=nodedb
       - SCALABLE=true
       - RABBIT_HOST=rabbit
+      # - PARSE_MSG=true
     command: [nodemon, ./bin/www]
-
-    # stdin_open: true
-    # tty: true
-    # command: bash
-    # ports:
-    #   - 8081:3000
-  # ap2:
-  #   build: ./app
-  #   image: ageapps/docker-chat:app
-  #   volumes:
-  #     - ./app:/app # volume in host -> $(pwd)/database
-  #     - /app/node_modules # volume node_modules from container
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #   labels:
-  #     - "traefik.backend=app"
-  #     - "traefik.frontend.rule=Host:app.docker.localhost"
-  #     - "traefik.backend.loadbalancer.stickiness=true"
-  #     - "traefik.backend.loadbalancer.stickiness.cookieName=back"
-  #   environment:
-  #     - DEBUG=docker-chat:*
-  #     - MONGO_USERNAME=node
-  #     - MONGO_PASSWORD=node
-  #     - MONGO_DATABASE=nodedb
-  #     - SCALABLE=true
-  #     - RABBIT_HOST=rabbit
-  #   stdin_open: true
-  #   tty: true
-  #   command: bash
-  #   ports:
-  #     - 8082:3000
-    # command: [nodemon, ./bin/www]
 
   db:
     build: ./mongo

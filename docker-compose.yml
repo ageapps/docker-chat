@@ -28,6 +28,7 @@ services:
       - MONGO_USERNAME=node
       - MONGO_PASSWORD=node
       - MONGO_DATABASE=nodedb
+      # - PARSE_MSG=true
       # - SCALABLE=true
       # - REDIS_HOST=redis
       # - RABBIT_HOST=rabbit

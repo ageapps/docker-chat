@@ -2,7 +2,10 @@ module.exports = function (mongoose) {
     var roomSchema = mongoose.Schema({
         name: String,
         connected: {
-            type: [String],
+            type: [{
+                id: String,
+                number: Number
+            }],
             default: []
         }
     }, {

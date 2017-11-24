@@ -31,6 +31,7 @@ services:
       - MONGO_DATABASE=nodedb
       - SCALABLE=true
       - REDIS_HOST=redis
+      - PARSE_MSG=true
     # ports:
     #   - 8080:3000
     command: [nodemon, ./bin/www]

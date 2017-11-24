@@ -17,21 +17,42 @@ userSchema.methods.addMsg = function (msg, cb) {
 };
 
 roomSchema.methods.connectedUser = function (id, cb) {
-    var index = this.connected.indexOf(id);
-    if (!(index > -1)) {
-        this.connected.push(id);
+    if (this.connected.length === 0) {
+        this.connected.push({
+            id: id,
+            number: 1
+        });
+    } else {
+        for (i = 0; i < this.connected.length; i++) {
+            if (this.connected[i].id === id) {
+                this.connected[i].number = this.connected[i].number + 1;
+                break;
+            } else {
+                this.connected.push({
+                    id: id,
+                    number: 1
+                });
+                break;
+            }
+        }
     }
-    room = this;
-    this.save(function(){
+    const room = this;
+    this.save(function () {
         return cb(room);
     });
 };
 roomSchema.methods.disconnectedUser = function (id, cb) {
-    var index = this.connected.indexOf(id);
-    if (index > -1) {
-        this.connected.splice(index, 1);
+
+    for (i = 0; i < this.connected.length; i++) {
+        if (this.connected[i].id === id) {
+            if (this.connected[i].number > 1) {
+                this.connected[i].number = this.connected[i].number - 1;
+            } else {
+                this.connected.splice(i, 1);
+            }
+        }
     }
-    room = this;
+    const room = this;
     this.save(function () {
         return cb(room);
     });
