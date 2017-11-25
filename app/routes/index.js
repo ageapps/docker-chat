@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var path = require('path');
 var os = require("os");
+var fs = require("fs");
 var userController = require('../controllers/user_controller');
 var debug = require('debug')('docker-chat:routes');
 const multer = require('multer')
