@@ -9,4 +9,6 @@ data:
   db.port: "27017"
   db.host: mongo
   app.redis_host: redis
+  app.rabbit_host: rabbit
   app.port: "3000"
+  app.scalable: "true"

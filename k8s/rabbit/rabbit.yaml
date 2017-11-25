@@ -1,0 +1,75 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: rabbit
+spec:
+  type: ClusterIP
+  selector:
+    app: rabbit
+    tier: backend
+  ports:
+    - name: epmd
+      port: 4369
+      targetPort: epmd
+    - name: amqp
+      port: 5672
+      targetPort: amqp
+    - name: amqp-tls
+      port: 5671
+      targetPort: amqp-tls
+    - name: stats
+      port: 15672
+      targetPort: stats
+    - name: inter-node
+      port: 25672
+      targetPort: inter-node
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: rabbit
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rabbit
+        tier: backend
+    spec:
+      containers:
+        - name: "rabbit"
+          image: "rabbitmq:3-management"
+          imagePullPolicy: Always
+          env:
+
+          ######   DEVELOPMENT VARIABLE #######
+          - name: REDEPLOY_VAR
+            value: 'v1'
+
+          ports:
+            - name: epmd
+              containerPort: 4369
+            - name: amqp
+              containerPort: 5672
+            - name: amqp-tls
+              containerPort: 5671
+            - name: stats
+              containerPort: 15672
+            - name: inter-node
+              containerPort: 25672
+          livenessProbe:
+            exec:
+              command:
+              - rabbitmqctl
+              - status
+            initialDelaySeconds: 120
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+              - rabbitmqctl
+              - status
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 5

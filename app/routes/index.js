@@ -19,6 +19,13 @@ var storage = multer.diskStorage({
     }
 })
 
+if (!fs.existsSync(storage_volume)) {
+    fs.mkdirSync(storage_volume);
+    if (!fs.existsSync(upload_location)) {
+        fs.mkdirSync(upload_location);
+    }
+}
+
 var upload = multer({
     storage: storage
 })
