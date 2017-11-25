@@ -218,7 +218,21 @@ li {
 
 .panel-default {
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+.panel-body form{
+    display: inline;
+}
+.panel-body form input{
+    display: inline;
+}
+.panel-body .avatar-image{
+    width: 50px;
+    height: 50px;
+}
+
 
 @media (max-width: 650px) {
     #chat_input button, #chat_input input {

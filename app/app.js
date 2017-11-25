@@ -27,6 +27,7 @@ app.use(cookieParser());
 
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'uploads')));
 
 var port = process.env.DB_PORT || '27017';
 var host = process.env.DB_HOST || 'db';

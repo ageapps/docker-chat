@@ -4,6 +4,26 @@ var path = require('path');
 var os = require("os");
 var userController = require('../controllers/user_controller');
 var debug = require('debug')('docker-chat:routes');
+const multer = require('multer')
+const storage_volume = process.env.STORAGE_VOLUME || '/uploads';
+const avatar_path = '/avatars';
+const upload_location = path.join(storage_volume, avatar_path);
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '..', upload_location))
+    },
+    filename: function (req, file, cb) {
+        let ext = path.extname(file.originalname);
+        cb(null, file.fieldname.replace(/\W+/g, '-').toLowerCase() + '-' + Date.now() + ext)
+    }
+})
+
+var upload = multer({
+    storage: storage
+})
+
+
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -41,6 +61,20 @@ router.get('/login', function (req, res, next) {
         });
     }
 });
+
+/* POST avatar. */
+router.post('/avatar', upload.single('avatar'), function (req, res, next) {
+    if (!req.session.user) {
+        res.redirect('/login');
+    } else {
+        let file = path.join(avatar_path, req.file.filename);
+        userController.uploadAvatar(req.session.user.name, file, function (user) {
+            req.session.user = user;
+            res.redirect('/');
+        });
+    }
+});
+
 
 /* GET logout page. */
 router.get('/logout', function (req, res, next) {

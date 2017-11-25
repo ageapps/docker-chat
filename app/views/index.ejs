@@ -31,6 +31,13 @@
     <div class="chat_container">
       <div class="panel panel-default panel-dark container">
         <div class="panel-body pannel-body-left col-sm-6 col-xs-12 ">
+            <% if  (session.user.avatar){ %>
+              <img src="<%= session.user.avatar %>" id="avatar-image" class="img-fluid img-circle avatar-image" alt="">        
+            <% } %>
+              <form action="/avatar" method="post" enctype="multipart/form-data" <% if  (session.user.avatar){ %> style="display: none" <% } %> >
+                  <input id="avatar" name="avatar" type="file"> 
+                  <input type="submit" id="avatar_submit" value="Upload Image" name="submit" style="display: none">                  
+              </form>
           <strong id="user_name"><%= session.user.name %></strong>
           <a href="/logout">logout</a>
         </div>

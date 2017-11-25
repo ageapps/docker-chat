@@ -1,21 +1,41 @@
 version: "2.1"
 services:
+  proxy:
+    image: traefik
+    command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/null:/traefik.toml
   app:
     build: ./app
     image: ageapps/docker-chat:app
     volumes:
-      - ./app:/app # volume in host
+      - ./app:/app # volume in host -> $(pwd)/database
       - /app/node_modules # volume node_modules from container
     depends_on:
       db:
         condition: service_healthy
+    labels:
+      - "traefik.backend=app"
+      - "traefik.frontend.rule=Host:app.docker.localhost"
+      - "traefik.backend.loadbalancer.stickiness=true"
+      - "traefik.backend.loadbalancer.stickiness.cookieName=back"
     environment:
       - DEBUG=docker-chat:*
       - MONGO_USERNAME=node
       - MONGO_PASSWORD=node
       - MONGO_DATABASE=nodedb
-    ports:
-      - 8080:3000
+      # - PARSE_MSG=true
+      # - SCALABLE=true
+      # - REDIS_HOST=redis
+      # - RABBIT_HOST=rabbit
+      # - KAFKA_HOST=kafka
+      # - NATS_HOST=nats
+    # ports:
+    #   - 8080:3000
     command: [nodemon, ./bin/www]
   db:
     build: ./mongo

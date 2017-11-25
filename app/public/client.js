@@ -12,7 +12,9 @@ $(document).ready(function () {
     } else {
         window.location.replace("/logout");
     }
-
+    $('#avatar-image').click(function(){
+        $("#avatar").click();
+    })
     $('#chat_input').submit(function () {
         if ($('#m').val() && $('#m').val() != "") {
             var date = new Date();
@@ -25,6 +27,11 @@ $(document).ready(function () {
             $('#m').val('');
         }
         return false;
+    });
+
+
+    $("#avatar").change(function () {
+        $("#avatar_submit").click();
     });
 
     socket.on('connect', function () {

@@ -3,6 +3,7 @@ module.exports = function(mongoose) {
 
     var userSchema = mongoose.Schema({
         name: String,
+        avatar: String,
         messages: [messageSchema]
     }, {
         timestamps: true
