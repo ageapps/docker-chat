@@ -2,20 +2,28 @@
 
 Dockerized chat, based on my previous project [SocketIOChatDemo], which is an example of a web application using *socket.io* library.
 
+This repository is a perfect example for a dockerized application having multiple services like a Database and a Backend. I personally use this project in demos for different technologies like [Kubernetes] or [Docker].
 
-Following the [Microservices architecture], the system consists on two services that run in separate containers:
+This project tries to follow a [Microservices architecture] where either in the [basic](#basic) setup nor the [advanced](#advanced)  consist on multiple services that run in separate containers
 
-+ Web service: [node.js] server. Using the official [node image].
-+ Database service: [MongoDB] database. Using the official [mongo image].
 
 
 ## Demo
 
-Yo can find a demo, working [here]
+This a basic demo of the chat working
+![demo](https://github.com/ageapps/docker-chat/blob/master/art/chat_demo.gif?raw=true)
 
-![demo](https://github.com/ageapps/docker-chat/blob/master/chat_demo.gif?raw=true)
+<a name='basic'></a>
 
-## Usage with git
+## Basic Setup
+The basic setup ads to the [SocketIOChatDemo] a database where all mesages will be stored. The resulting system has the following modules and is described in the docker-compose.yaml'':
+![basic](https://github.com/ageapps/docker-chat/blob/master/art/arch_1.png?raw=true)
+
++ __Web service (app):__ [node.js] server. Using the official [node image].
++ __Database service (db):__ [MongoDB] database. Using the official [mongo image].
+
+
+### Usage with git
 
 ```groovy
 $ git clone https://github.com/ageapps/docker-chat
@@ -23,7 +31,7 @@ $ cd docker-chat
 $ docker-compose up
 // connect in your browser to <host IP>:8080
 ```
-## Usage with Docker Hub
+### Usage with Docker Hub
 
 ```groovy
 // run mongo service
@@ -33,6 +41,13 @@ $ docker run -d --name node_chat_server -v "$(pwd)"/database:/data --link mongo_
 // connect in your browser to <host IP>:8080
 ```
 
+
+<a name='advanced'></a>
+
+## Advanced Setup
+
+
+
 ## Resources
 + [Docker]: Software containerization platform
 + [SocketIOChatDemo]: Chat web application.
@@ -41,6 +56,7 @@ $ docker run -d --name node_chat_server -v "$(pwd)"/database:/data --link mongo_
 + [mongoose]: MongoDB object modeling for *node.js*.
 + [docker-build]: Automated build of *Docker* images.
 + [docker-compose]: Automated configuration and run of multi-container *Docker* applications.
++ [Kubernetes]: Open-source system for automating deployment, scaling, and management of containerized applications.
 
 
 [here]: http://swarm1397.cloudhero.io:8080/
@@ -54,3 +70,4 @@ $ docker run -d --name node_chat_server -v "$(pwd)"/database:/data --link mongo_
 [Docker]: https://docs.docker.com/
 [docker-compose]:https://docs.docker.com/compose/compose-file/
 [docker-build]:https://docs.docker.com/engine/reference/builder/
+[Kubernetes]:https://kubernetes.io/

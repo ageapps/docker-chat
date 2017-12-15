@@ -22,7 +22,7 @@ kind: Deployment
 metadata:
   name: docker-chat
 spec:
-  replicas: 5
+  replicas: 1
   template:
     metadata:
       labels:
@@ -81,7 +81,7 @@ spec:
               key: app.scalable
         ######   DEVELOPMENT VARIABLE #######
         - name: REDEPLOY_VAR
-          value: "v1"
+          value: "v2"
 
 
         livenessProbe:
