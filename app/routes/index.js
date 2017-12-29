@@ -36,7 +36,7 @@ var upload = multer({
 /* GET home page. */
 router.get('/', function (req, res, next) {
     if (!req.session.user) {
-        res.redirect('/');
+        res.redirect('/login');
     } else {
         res.render('index', {
             title: 'SocketIO Chat Demo',
