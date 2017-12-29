@@ -1,0 +1,54 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: browser
+  labels:
+    app: docket-chat
+    tier: frontend
+spec:
+  selector:
+    app: docket-chat
+    tier: frontend
+  ports:
+  - protocol: TCP
+    port: 8080
+    name: http
+    targetPort: 8080 
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: browser
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: docker-chat
+        tier: frontend
+    spec:
+      volumes:
+      - name: nginx-content
+        glusterfs:
+          endpoints: glusterfs-cluster
+          path: kube-vol
+          readOnly: true   
+      containers:
+      - name: "browser"
+        image: "ageapps/docker-chat:nginx"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: nginx-content
+          mountPath: /content
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/usr/sbin/nginx","-s","quit"]
+        env:
+        ######   DEVELOPMENT VARIABLE #######
+        - name: REDEPLOY_VAR
+          value: "v1"

@@ -168,11 +168,6 @@ These are global configurations needed for deployment, like database credentials
 ```bash
 $ kubectl apply -f k8s/global-congig.yaml
 ```
-#### Global configurations
-These are global configurations needed for deployment, like database credentials and other enviroment variables.
-```bash
-$ kubectl apply -f k8s/global-congig.yaml
-```
 #### Services
 These include the rest of the services used in the system.
 
@@ -207,6 +202,60 @@ $ kubectl apply -f k8s/redis
 $ kubectl apply -f k8s/nats
 # Main service
 $ kubectl apply -f k8s/docker-chat
+```
+
+#### Ingress deployment
+As mentioned in the services section, since WebSockets are used, it's needed to have session affinity in the `Load Balancer` service of our system, for this, it's proviced an example [here](./k8s/ingress) (`/k8s/ingress`) using [NGINX Ingress Controller]. There can be found more information about this ingress controller and other examples of them in the [ingress documentation].
+
+After following these instructions, the ingress has to be configured.
+```bash
+$ kubectl apply -f k8s/ingress/app-ingress.yaml
+```
+#### GlusterFS deployment
+Considering a [GlusterFS] cluster is already deployed ([Here](https://github.com/GoogleCloudPlatform/compute-ansible-gluster) is a great example of how to do it) let`s moun it as a volume in our containers.
+In order to use the [GlusterFS] feature there are some considerations to take care. On the first hand, the cluster ip adresses should be added into the `glusterfs/glusterfs.yaml` file.
+```yaml
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: glusterfs
+subsets:
+  - addresses:
+      - ip: XXXXX
+    ports:
+      - port: 1
+  - addresses:
+      - ip: XXXXX
+    ports:
+      - port: 1
+```
+Additionaly, the commented lines related to the volume mount of the GlusterFS system need to be uncommented:
+```yaml
+spec:
+      # volumes:
+      # - name: glusterfs-content
+      #   glusterfs:
+      #     endpoints: glusterfs-cluster
+      #     path: kube-vol
+      #     readOnly: true   
+      containers:
+      - name: "docker-chat"
+        image: "ageapps/docker-chat:app"
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 3000
+        command: ["bash", "-c", "nodemon ./bin/www"]
+        # volumeMounts:
+        # - name: glusterfs-content
+        #   mountPath: /uploads
+```
+Finally, update all services and deploy the needed services. There is the possibillity to test what the content inside the cluster is by deloying the `browser` service.
+```bash
+$ kubectl apply -f k8s/glusterfs
+# Main service
+$ kubectl apply -f k8s/docker-chat
+# Browser service
+$ kubectl apply -f k8s/browser
 ```
 <a name='resources'></a>
 
@@ -247,3 +296,5 @@ $ kubectl apply -f k8s/docker-chat
 [traefik image]:https://hub.docker.com/r/_/traefik/
 [SocketIO]:https://socket.io/
 [Express Session]:https://github.com/expressjs/session
+[NGINX Ingress Controller]: https://github.com/kubernetes/ingress-nginx
+[ingress documentation]: https://github.com/kubernetes/ingress-nginx/blob/master/docs/catalog.md

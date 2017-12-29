@@ -10,9 +10,6 @@ const storage_volume = process.env.STORAGE_VOLUME || '/uploads';
 const avatar_path = '/avatars';
 const upload_location = path.join(storage_volume, avatar_path);
 
-const url_prefix = process.env.URL_PREFIX || '';
-
-
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, path.join(__dirname, '..', upload_location))
@@ -57,14 +54,14 @@ router.post('/', function (req, res, next) {
     userController.getUser(user, function (foundUser) {
         debug(foundUser.name);
         req.session.user = foundUser;
-        res.redirect(path.join('/', url_prefix, '/'));
+        res.redirect('/');
     });
 });
 
 /* GET login page. */
 router.get('/login', function (req, res, next) {
     if (req.session.user) {
-        res.redirect(path.join('/', url_prefix, '/'));
+        res.redirect('/');
     } else {
         res.render('login', {
             title: 'SocketIO Chat Demo',
@@ -81,7 +78,7 @@ router.post('/avatar', upload.single('avatar'), function (req, res, next) {
         let file = path.join(avatar_path, req.file.filename);
         userController.uploadAvatar(req.session.user.name, file, function (user) {
             req.session.user = user;
-            res.redirect(path.join('/', url_prefix, '/'));
+            res.redirect('/');
         });
     }
 });

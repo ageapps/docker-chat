@@ -6,6 +6,7 @@ metadata:
     app: docket-chat
     tier: backend
 spec:
+  type: NodePort
   selector:
     app: docker-chat
     tier: backend
@@ -29,6 +30,12 @@ spec:
         app: docker-chat
         tier: backend
     spec:
+      # volumes:
+      # - name: glusterfs-content
+      #   glusterfs:
+      #     endpoints: glusterfs-cluster
+      #     path: kube-vol
+      #     readOnly: true   
       containers:
       - name: "docker-chat"
         image: "ageapps/docker-chat:app"
@@ -36,6 +43,9 @@ spec:
         ports:
           - containerPort: 3000
         command: ["bash", "-c", "nodemon ./bin/www"]
+        # volumeMounts:
+        # - name: glusterfs-content
+        #   mountPath: /uploads
         env:
         - name: PORT
           valueFrom:
@@ -75,18 +85,18 @@ spec:
               name: global-config
               key: app.scalable
         ###### MESSAGE BROKERS ########
-        # REDIS
-        - name: REDIS_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: global-config
-              key: app.redis_host
-        # # RABBIT
-        # - name: RABBIT_HOST
+        # # REDIS
+        # - name: REDIS_HOST
         #   valueFrom:
         #     configMapKeyRef:
         #       name: global-config
-        #       key: app.rabbit_host
+        #       key: app.redis_host
+        # RABBIT
+        - name: RABBIT_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: app.rabbit_host
         # # NATS
         # - name: NATS_HOST
         #   valueFrom:
