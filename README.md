@@ -6,6 +6,21 @@ This repository is a perfect example for a dockerized application having multipl
 
 This project tries to follow a [Microservices architecture] where either in the [basic](#basic) setup nor the [advanced](#advanced)  consist on multiple services that run in separate containers
 
+
+- [Features](#features)
+- [Demo](#demo)
+- [Basic Setup](#basic)
+    - [Services](#b-services)    
+    - [Usage with git](#b-git)
+    - [Usage with Docker Hub](#b-hub)
+- [Advanced Setup](#advanced)
+    - [Services](#a-services)    
+    - [Deployment with docker-compose](#dep_docker)
+    - [Deployment with Kubernetes](#dep_k8s)
+- [Resources](#resources)
+
+
+
 <a name='features'></a>
 
 ## Features
@@ -26,6 +41,7 @@ IMAGE WEBSOCKET
     + Distributed filesystem: when deploying the application in a real-life enviroment, replicas will be distributed son sharing a local volume becomes impossible. For this, [Distributed Filesystems] are the best solution, in this example it will be used [GlusterFS].
 
 IMAGE STORAGE
+<a name='demo'></a>
 
 ## Demo
 
@@ -37,6 +53,8 @@ This a basic demo of the chat working
 ## Basic Setup
 The basic setup adds to the [SocketIOChatDemo] a database where all mesages will be stored. Using this setup it is assumed that no service will be repplicated. The resulting system has the following modules and is described in the `docker-compose.yaml`.
 
+<a name='b-services'></a>
+
 ### Services
 
 ![basic](https://github.com/ageapps/docker-chat/blob/master/art/arch_1.png?raw=true)
@@ -44,6 +62,7 @@ The basic setup adds to the [SocketIOChatDemo] a database where all mesages will
 + __Database (db):__ [MongoDB] database. It uses the official [MongoDB image] with an additional startup script which sets up users in order to have a securized database (using `MONGO_DB_APP_PASSWORD`, `MONGO_DB_APP_USERNAME`, `MONGO_DB_APP_DATABASE` enviroment variables).
 .
 
+<a name='b-git'></a>
 
 ### Usage with git
 
@@ -53,6 +72,8 @@ $ cd docker-chat
 $ docker-compose up
 # connect in your browser to <host IP>:8888
 ```
+<a name='b-hub'></a>
+
 ### Usage with Docker Hub
 
 ```bash
@@ -62,7 +83,6 @@ $ docker run -v "$(pwd)"/database:/data --name mongo_chat_db -d mongo mongod --s
 $ docker run -d --name node_chat_server -v "$(pwd)"/database:/data --link mongo_chat_db:db -p 8080:4000 ageapps/docker-chat
 # connect in your browser to <host IP>:8888
 ```
-
 
 <a name='advanced'></a>
 
@@ -74,6 +94,8 @@ In order to deploy a container based system into a distributed system there will
 
 + [Using docker-compose](#dep_docker): any service can be scalled easilly and it is navively supported by Docker.
 + [Using Kubernetes](#dep_k8s): K8s is currently one of the most used container orchestration tool. This is due to its versatility and high performance.
+
+<a name='a-services'></a>
 
 ### Services
 
@@ -186,6 +208,7 @@ $ kubectl apply -f k8s/nats
 # Main service
 $ kubectl apply -f k8s/docker-chat
 ```
+<a name='resources'></a>
 
 ## Resources
 + [Docker]: Software containerization platform
