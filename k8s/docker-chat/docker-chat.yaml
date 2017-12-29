@@ -44,11 +44,6 @@ spec:
               key: app.port
         - name: DEBUG
           value: "docker-chat:*"
-        - name: RABBIT_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: global-config
-              key: app.rabbit_host
         - name: MONGO_PASSWORD
           valueFrom:
             configMapKeyRef:
@@ -79,9 +74,29 @@ spec:
             configMapKeyRef:
               name: global-config
               key: app.scalable
+        ###### MESSAGE BROKERS ########
+        # REDIS
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: app.redis_host
+        # # RABBIT
+        # - name: RABBIT_HOST
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: global-config
+        #       key: app.rabbit_host
+        # # NATS
+        # - name: NATS_HOST
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: global-config
+        #       key: app.nats_host
+
         ######   DEVELOPMENT VARIABLE #######
         - name: REDEPLOY_VAR
-          value: "v2"
+          value: "v1"
 
 
         livenessProbe:

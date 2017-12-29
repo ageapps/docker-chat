@@ -6,7 +6,26 @@ This repository is a perfect example for a dockerized application having multipl
 
 This project tries to follow a [Microservices architecture] where either in the [basic](#basic) setup nor the [advanced](#advanced)  consist on multiple services that run in separate containers
 
+<a name='features'></a>
 
+## Features
+
+In order to provide a realistic demo this applications has the following features:
+
++  __Database Perssistance:__ all messages and users are stored perssistently in a database.
+
++ __Session Management:__ whenever te name is introduced, a session is created and managed using NodeJS module [Express Session]. Aditionally, in order to have persistent sessions while scalling our services, sessions are stored in the database using [MongoStore].
++ __Websocket Support:__ being a chat application it's needed some kind of real time comunication between the clients and the server, for this [SocketIO] is used as [WebSocket] library. When scalling services using WebSockets there are 2 things to take care of; 
+    + `Session affinity`: in order to stablish the [WebSocket handshake] between the client and one of the replicas.
+    + `Message replication`: once the hanndshake is stablished, messages need to be replicated through al replicas usinga  queue that comunicates all of them. 
+
+IMAGE WEBSOCKET
+
++ __Storage Management:__  users can upload a profile photo, this implies handling file uploads and storage management. When scalling services, storage management becomes more complicated because all replicas need to access the same filesystem. This will be solved in 2 ways:
+    + Local volume: when using `docker-compose` in a local enviroment this can be solved by creating a shared Docker `volume` between replicas.
+    + Distributed filesystem: when deploying the application in a real-life enviroment, replicas will be distributed son sharing a local volume becomes impossible. For this, [Distributed Filesystems] are the best solution, in this example it will be used [GlusterFS].
+
+IMAGE STORAGE
 
 ## Demo
 
@@ -16,42 +35,162 @@ This a basic demo of the chat working
 <a name='basic'></a>
 
 ## Basic Setup
-The basic setup ads to the [SocketIOChatDemo] a database where all mesages will be stored. The resulting system has the following modules and is described in the docker-compose.yaml'':
-![basic](https://github.com/ageapps/docker-chat/blob/master/art/arch_1.png?raw=true)
+The basic setup adds to the [SocketIOChatDemo] a database where all mesages will be stored. Using this setup it is assumed that no service will be repplicated. The resulting system has the following modules and is described in the `docker-compose.yaml`.
 
-+ __Web service (app):__ [node.js] server. Using the official [node image].
-+ __Database service (db):__ [MongoDB] database. Using the official [mongo image].
+### Services
+
+![basic](https://github.com/ageapps/docker-chat/blob/master/art/arch_1.png?raw=true)
++ __Web (app):__ [NodeJS] server containin all business logic and that [features](#features)  mentioned above. It uses the official [NodeJS image] as base image.
++ __Database (db):__ [MongoDB] database. It uses the official [MongoDB image] with an additional startup script which sets up users in order to have a securized database (using `MONGO_DB_APP_PASSWORD`, `MONGO_DB_APP_USERNAME`, `MONGO_DB_APP_DATABASE` enviroment variables).
+.
 
 
 ### Usage with git
 
-```groovy
+```bash
 $ git clone https://github.com/ageapps/docker-chat
 $ cd docker-chat
 $ docker-compose up
-// connect in your browser to <host IP>:8080
+# connect in your browser to <host IP>:8888
 ```
 ### Usage with Docker Hub
 
-```groovy
-// run mongo service
+```bash
+# run mongo service
 $ docker run -v "$(pwd)"/database:/data --name mongo_chat_db -d mongo mongod --smallfiles
-// run docker-chat image
+# run docker-chat image
 $ docker run -d --name node_chat_server -v "$(pwd)"/database:/data --link mongo_chat_db:db -p 8080:4000 ageapps/docker-chat
-// connect in your browser to <host IP>:8080
+# connect in your browser to <host IP>:8888
 ```
 
 
 <a name='advanced'></a>
 
+
 ## Advanced Setup
+The advanced setup tries to set this appplication in a real deployment scenario. This deployment will be distributed and aiming to reach a high availability system. All of this means that the arquitecture and setup will be more complex than the [basic](#basic) one. For advanced setup, enviroment variable `SCALABLE` needs to be setted to `true`.
 
+In order to deploy a container based system into a distributed system there will be used 2 deployment options.
 
++ [Using docker-compose](#dep_docker): any service can be scalled easilly and it is navively supported by Docker.
++ [Using Kubernetes](#dep_k8s): K8s is currently one of the most used container orchestration tool. This is due to its versatility and high performance.
+
+### Services
+
+![advanced](./art/arch_2.png)
++ __Web (app):__ [NodeJS] server containin all business logic and that [features](#features)  mentioned above. It uses the official [NodeJS image] as base image.
++ __Database (db):__ [MongoDB] database. It uses the official [MongoDB image] with an additional startup script which sets up users in order to have a securized database (using `MONGO_DB_APP_PASSWORD`, `MONGO_DB_APP_USERNAME`, `MONGO_DB_APP_DATABASE` enviroment variables).
+
++ __Load Balancer (proxy):__ [traefik] proxy. __This service is only used when deploying with `docker-compose`__. This load balancer is needed in order to handle the service repplication and balance traffic between them aswell as session affinity for WebSocket support. It uses the official [traefik image] being the access point to the system. There is a management interface accesing `localhost` in port `8080`.
+![traefik](./art/traefik.png)
+
++ __Message Broker (redis/rabbit/nats):__ This service is needed in order to scale WebSockets. The application supports 3 message brokers which are attached to [SocketIO] library as adapters:
+    + `Redis`: It's possible to use the [Redis]'s publish/subscribe service as message broker. For this it's used the [Redis Adapter].   
+        To connect to the Redis service it's needed to use the `REDIS_HOST` enviroment variable. 
+
+        __NOTE:__ Redis has an extra limitation that all messages used by the publish/subscribe service have to be strings, for this the `PARSE_MSG` enviroment variable has to be added.
+
+    + `RabbitMQ`:  It's possible to use the [RabbitMQ] as message broker. For this it's used the [Rabbit Adapter].   
+        To connect to the RabbitMQ service it's needed to use the `RABBIT_HOST` enviroment variable. 
+        RabbitMQ has a management web interface which is accessible using `localhost` in port `15672`.
+        ![rabbit](./art/rabbit.png)
+
+    + `NATS`: It's possible to use the [NATS] as message broker. For this it's used the [NATS Adapter].  
+        To connect to the NATS service it's needed to use the `NATS_HOST` enviroment variable. 
+        There is a NATS dashboard which can be accessed using `localhost` in port `3000`.
+
+        ![nats](./art/nats.png)
+
+<a name='dep_docker'></a>
+
+### Deployment with docker-compose
+In order to deploy the system with `docker-compose` it's needed an additional configuration. [traefik] proxy needs to use a DNS name in order to provide session affinity. For this, the DNS name chosen is `app.docker.localhost`, and it has to be added into the `/etc/hosts` file:
+
+```bash
+...
+127.0.0.1  app.docker.localhost
+...
+```
+Download the source code:
+```bash
+$ git clone https://github.com/ageapps/docker-chat
+$ cd docker-chat
+```
+Deploy with any of the configurations proposed
+```bash
+# Redis configuration
+$ docker-compose -f docker-compose.redis.yaml up
+# Rabbit configuration
+$ docker-compose -f docker-compose.rabbit.yaml up
+# Nats configuration
+$ docker-compose -f docker-compose.nats.yaml up
+# connect in your browser to app.docker.localhost
+# connect in your browser to <host IP>:8888 for the configuration pannel
+```
+Scale the app service
+```bash
+# Redis configuration
+$ docker-compose -f docker-compose.redis.yaml scale app=5
+# Rabbit configuration
+$ docker-compose -f docker-compose.rabbit.yaml scale app=5
+# Nats configuration
+$ docker-compose -f docker-compose.nats.yaml scale app=5
+```
+<a name='dep_k8s'></a>
+
+### Deployment with Kubernetes
+Once `kubectl` is setted up and connected to your cluster, the following steps should be followed in order to deploy the appliction:
+
+#### Global configurations
+These are global configurations needed for deployment, like database credentials.
+```bash
+$ kubectl apply -f k8s/global-congig.yaml
+```
+#### Global configurations
+These are global configurations needed for deployment, like database credentials and other enviroment variables.
+```bash
+$ kubectl apply -f k8s/global-congig.yaml
+```
+#### Services
+These include the rest of the services used in the system.
+
+Before deploying any service it's needed to choose a message broker, once this is done, it's necessary to configure it in the `k8s/docker-chat/docker-chat.yaml` file by un commenting the configuration needed for each message broker.
+```yaml
+###### MESSAGE BROKERS ########
+        # REDIS
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: app.redis_host
+        # # RABBIT
+        # - name: RABBIT_HOST
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: global-config
+        #       key: app.rabbit_host
+        # # NATS
+        # - name: NATS_HOST
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: global-config
+        #       key: app.nats_host
+```
+
+```bash
+$ kubectl apply -f k8s/mongo
+# Depending on chosen broker
+$ kubectl apply -f k8s/rabbit
+$ kubectl apply -f k8s/redis
+$ kubectl apply -f k8s/nats
+# Main service
+$ kubectl apply -f k8s/docker-chat
+```
 
 ## Resources
 + [Docker]: Software containerization platform
 + [SocketIOChatDemo]: Chat web application.
-+ [node.js]: Server enviroment.
++ [NodeJS]: Server enviroment.
 + [MongoDB]: NoSQL database system.
 + [mongoose]: MongoDB object modeling for *node.js*.
 + [docker-build]: Automated build of *Docker* images.
@@ -62,12 +201,26 @@ $ docker run -d --name node_chat_server -v "$(pwd)"/database:/data --link mongo_
 [here]: http://swarm1397.cloudhero.io:8080/
 [Microservices architecture]: http://microservices.io/patterns/microservices.html
 [SocketIOChatDemo]: https://github.com/ageapps/SocketIOChatDemo.git
-[node image]: https://hub.docker.com/_/node/
-[mongo image]: https://hub.docker.com/_/mongo/
+[NodeJS image]: https://hub.docker.com/_/node/
+[MongoDB image]: https://hub.docker.com/_/mongo/
 [MongoDB]: https://www.mongodb.com
 [mongoose]: http://mongoosejs.com/index.html
-[node.js]: http://nodejs.org
+[NodeJS]: http://nodejs.org
 [Docker]: https://docs.docker.com/
 [docker-compose]:https://docs.docker.com/compose/compose-file/
 [docker-build]:https://docs.docker.com/engine/reference/builder/
 [Kubernetes]:https://kubernetes.io/
+[WebSocket handshake]:https://tools.ietf.org/html/rfc6455
+[WebSocket]:https://en.wikipedia.org/wiki/WebSocket
+[MongoStore]:https://www.npmjs.com/package/connect-mongo
+[GlusterFS]:https://www.gluster.org/
+[traefik]:https://traefik.io/
+[NATS]:https://nats.io/
+[NATS Adapter]:https://www.npmjs.com/package/socket.io-nats
+[RabbitMQ]:https://www.rabbitmq.com/
+[Rabbit Adapter]:https://www.npmjs.com/package/socket.io-amqp
+[Redis]:https://redis.io/
+[Redis Adapter]:https://github.com/socketio/socket.io-redis
+[traefik image]:https://hub.docker.com/r/_/traefik/
+[SocketIO]:https://socket.io/
+[Express Session]:https://github.com/expressjs/session

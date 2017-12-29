@@ -10,5 +10,6 @@ data:
   db.host: mongo
   app.redis_host: redis
   app.rabbit_host: rabbit
+  app.nats_host: nats
   app.port: "3000"
   app.scalable: "true"

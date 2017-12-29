@@ -6,3 +6,4 @@ docker-compose-debug.yml
 Dockerfile-debug
 node_modules
 app/uploads/avatars/*
+database
