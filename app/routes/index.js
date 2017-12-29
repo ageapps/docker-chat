@@ -36,7 +36,7 @@ var upload = multer({
 /* GET home page. */
 router.get('/', function (req, res, next) {
     if (!req.session.user) {
-        res.redirect(path.join('/', url_prefix, '/login'));
+        res.redirect('/');
     } else {
         res.render('index', {
             title: 'SocketIO Chat Demo',
@@ -73,7 +73,7 @@ router.get('/login', function (req, res, next) {
 /* POST avatar. */
 router.post('/avatar', upload.single('avatar'), function (req, res, next) {
     if (!req.session.user) {
-        res.redirect(path.join('/', url_prefix, '/login'));
+        res.redirect('/');
     } else {
         let file = path.join(avatar_path, req.file.filename);
         userController.uploadAvatar(req.session.user.name, file, function (user) {
@@ -87,7 +87,7 @@ router.post('/avatar', upload.single('avatar'), function (req, res, next) {
 /* GET logout page. */
 router.get('/logout', function (req, res, next) {
     delete req.session.user;
-    res.redirect(path.join('/', url_prefix, '/'));
+    res.redirect('/');
 });
 
 router.get('/healthcheck', function (req, res, next) {
