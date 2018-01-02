@@ -57,10 +57,9 @@ The basic setup adds to the [SocketIOChatDemo] a database where all mesages will
 
 ### Services
 
-![basic](https://github.com/ageapps/docker-chat/blob/master/art/arch_1.png?raw=true)
+![basic](./art/arch_1.png)
 + __Web (app):__ [NodeJS] server containin all business logic and that [features](#features)  mentioned above. It uses the official [NodeJS image] as base image.
 + __Database (db):__ [MongoDB] database. It uses the official [MongoDB image] with an additional startup script which sets up users in order to have a securized database (using `MONGO_DB_APP_PASSWORD`, `MONGO_DB_APP_USERNAME`, `MONGO_DB_APP_DATABASE` enviroment variables).
-.
 
 <a name='b-git'></a>
 
@@ -212,7 +211,7 @@ After following these instructions, the ingress has to be configured.
 $ kubectl apply -f k8s/ingress/app-ingress.yaml
 ```
 #### GlusterFS deployment
-Considering a [GlusterFS] cluster is already deployed ([Here](https://github.com/GoogleCloudPlatform/compute-ansible-gluster) is a great example of how to do it) let`s moun it as a volume in our containers.
+Considering a [GlusterFS] cluster is already deployed ([Here](https://github.com/GoogleCloudPlatform/compute-ansible-gluster) is a great example of how to do it) let`s mount it as a volume in our containers.
 In order to use the [GlusterFS] feature there are some considerations to take care. On the first hand, the cluster ip adresses should be added into the `glusterfs/glusterfs.yaml` file.
 ```yaml
 kind: Endpoints
