@@ -1,4 +1,4 @@
-FROM node:9.2
+FROM node:9.2-alpine
 
 MAINTAINER Adrián García Espinosa "age.apps.dev@gmail.com"
 
