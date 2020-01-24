@@ -14,7 +14,7 @@ spec:
   - protocol: TCP
     port: 8080
     name: http
-    targetPort: 3000 
+    targetPort: 3000
 
 ---
 
@@ -35,14 +35,14 @@ spec:
       #   glusterfs:
       #     endpoints: glusterfs-cluster
       #     path: kube-vol
-      #     readOnly: true   
+      #     readOnly: true
       containers:
       - name: "docker-chat"
         image: "ageapps/docker-chat:app"
         imagePullPolicy: Always
         ports:
           - containerPort: 3000
-        command: ["bash", "-c", "nodemon ./bin/www"]
+        command: ["/bin/sh", "-c", "nodemon ./bin/www"]
         # volumeMounts:
         # - name: glusterfs-content
         #   mountPath: /uploads
