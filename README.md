@@ -10,11 +10,11 @@ This project tries to follow a [Microservices architecture] where either in the 
 - [Features](#features)
 - [Demo](#demo)
 - [Basic Setup](#basic)
-    - [Services](#b-services)    
+    - [Services](#b-services)
     - [Usage with git](#b-git)
     - [Usage with Docker Hub](#b-hub)
 - [Advanced Setup](#advanced)
-    - [Services](#a-services)    
+    - [Services](#a-services)
     - [Deployment with docker-compose](#dep_docker)
     - [Deployment with Kubernetes](#dep_k8s)
 - [Resources](#resources)
@@ -30,9 +30,9 @@ In order to provide a realistic demo this applications has the following feature
 +  __Database Perssistance:__ all messages and users are stored perssistently in a database.
 
 + __Session Management:__ whenever te name is introduced, a session is created and managed using NodeJS module [Express Session]. Aditionally, in order to have persistent sessions while scalling our services, sessions are stored in the database using [MongoStore].
-+ __Websocket Support:__ being a chat application it's needed some kind of real time comunication between the clients and the server, for this [SocketIO] is used as [WebSocket] library. When scalling services using WebSockets there are 2 things to take care of; 
++ __Websocket Support:__ being a chat application it's needed some kind of real time comunication between the clients and the server, for this [SocketIO] is used as [WebSocket] library. When scalling services using WebSockets there are 2 things to take care of;
     + `Session affinity`: in order to stablish the [WebSocket handshake] between the client and one of the replicas.
-    + `Message replication`: once the hanndshake is stablished, messages need to be replicated through al replicas usinga  queue that comunicates all of them. 
+    + `Message replication`: once the hanndshake is stablished, messages need to be replicated through al replicas usinga  queue that comunicates all of them.
 
 IMAGE WEBSOCKET
 
@@ -87,7 +87,7 @@ $ docker run -d --name node_chat_server -v "$(pwd)"/database:/data --link mongo_
 
 
 ## Advanced Setup
-The advanced setup tries to set this appplication in a real deployment scenario. This deployment will be distributed and aiming to reach a high availability system. All of this means that the arquitecture and setup will be more complex than the [basic](#basic) one. For advanced setup, enviroment variable `SCALABLE` needs to be setted to `true`.
+The advanced setup tries to set up the appplication in a real deployment scenario. This deployment will be distributed and aims to reach a high availability system. All of this means that the architecture and setup will be more complex than the [basic](#basic) one. For advanced setup, the enviroment variable `SCALABLE` needs to be set to `true`.
 
 In order to deploy a container based system into a distributed system there will be used 2 deployment options.
 
@@ -106,18 +106,18 @@ In order to deploy a container based system into a distributed system there will
 ![traefik](./art/traefik.png)
 
 + __Message Broker (redis/rabbit/nats):__ This service is needed in order to scale WebSockets. The application supports 3 message brokers which are attached to [SocketIO] library as adapters:
-    + `Redis`: It's possible to use the [Redis]'s publish/subscribe service as message broker. For this it's used the [Redis Adapter].   
-        To connect to the Redis service it's needed to use the `REDIS_HOST` enviroment variable. 
+    + `Redis`: It's possible to use the [Redis]'s publish/subscribe service as message broker. For this it's used the [Redis Adapter].
+        To connect to the Redis service it's needed to use the `REDIS_HOST` enviroment variable.
 
         __NOTE:__ Redis has an extra limitation that all messages used by the publish/subscribe service have to be strings, for this the `PARSE_MSG` enviroment variable has to be added.
 
-    + `RabbitMQ`:  It's possible to use the [RabbitMQ] as message broker. For this it's used the [Rabbit Adapter].   
-        To connect to the RabbitMQ service it's needed to use the `RABBIT_HOST` enviroment variable. 
+    + `RabbitMQ`:  It's possible to use the [RabbitMQ] as message broker. For this it's used the [Rabbit Adapter].
+        To connect to the RabbitMQ service it's needed to use the `RABBIT_HOST` enviroment variable.
         RabbitMQ has a management web interface which is accessible using `localhost` in port `15672`.
         ![rabbit](./art/rabbit.png)
 
-    + `NATS`: It's possible to use the [NATS] as message broker. For this it's used the [NATS Adapter].  
-        To connect to the NATS service it's needed to use the `NATS_HOST` enviroment variable. 
+    + `NATS`: It's possible to use the [NATS] as message broker. For this it's used the [NATS Adapter].
+        To connect to the NATS service it's needed to use the `NATS_HOST` enviroment variable.
         There is a NATS dashboard which can be accessed using `localhost` in port `3000`.
 
         ![nats](./art/nats.png)
@@ -160,12 +160,12 @@ $ docker-compose -f docker-compose.nats.yaml scale app=5
 <a name='dep_k8s'></a>
 
 ### Deployment with Kubernetes
-Once `kubectl` is setted up and connected to your cluster, the following steps should be followed in order to deploy the appliction:
+Once `kubectl` is set up and connected to your cluster, the following steps should be followed in order to deploy the application:
 
 #### Global configurations
-These are global configurations needed for deployment, like database credentials.
+There are global configurations needed for deployment, like database credentials.
 ```bash
-$ kubectl apply -f k8s/global-congig.yaml
+$ kubectl apply -f k8s/global-config.yaml
 ```
 #### Services
 These include the rest of the services used in the system.
@@ -173,18 +173,18 @@ These include the rest of the services used in the system.
 Before deploying any service it's needed to choose a message broker, once this is done, it's necessary to configure it in the `k8s/docker-chat/docker-chat.yaml` file by un commenting the configuration needed for each message broker.
 ```yaml
 ###### MESSAGE BROKERS ########
-        # REDIS
-        - name: REDIS_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: global-config
-              key: app.redis_host
-        # # RABBIT
-        # - name: RABBIT_HOST
+        # # REDIS
+        # - name: REDIS_HOST
         #   valueFrom:
         #     configMapKeyRef:
         #       name: global-config
-        #       key: app.rabbit_host
+        #       key: app.redis_host
+        # RABBIT
+        - name: RABBIT_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: app.rabbit_host
         # # NATS
         # - name: NATS_HOST
         #   valueFrom:
@@ -204,7 +204,7 @@ $ kubectl apply -f k8s/docker-chat
 ```
 
 #### Ingress deployment
-As mentioned in the services section, since WebSockets are used, it's needed to have session affinity in the `Load Balancer` service of our system, for this, it's proviced an example [here](./k8s/ingress) (`/k8s/ingress`) using [NGINX Ingress Controller]. There can be found more information about this ingress controller and other examples of them in the [ingress documentation].
+As mentioned in the services section, since WebSockets are used, it's needed to have session affinity in the `Load Balancer` service of our system, for this, it's proviced an example [here](./k8s/ingress) (`/k8s/ingress`) using [NGINX Ingress Controller]. You can find more information about the ingress controller and other examples of them in the [ingress documentation].
 
 After following these instructions, the ingress has to be configured.
 ```bash
@@ -236,7 +236,7 @@ spec:
       #   glusterfs:
       #     endpoints: glusterfs-cluster
       #     path: kube-vol
-      #     readOnly: true   
+      #     readOnly: true
       containers:
       - name: "docker-chat"
         image: "ageapps/docker-chat:app"
